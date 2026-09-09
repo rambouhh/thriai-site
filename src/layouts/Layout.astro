@@ -1,0 +1,76 @@
+---
+import '../styles/global.css';
+interface Props { title: string; description?: string; }
+const {
+  title,
+  description = 'Thriai is a fractional CFO firm for technology companies where every client runs on a governed, AI-queryable finance platform. Senior-only delivery, published pricing.',
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: 'Thriai LLC',
+  url: 'https://thriai.io',
+  email: 'hello@thriai.io',
+  description: 'Fractional CFO leadership and AI-native finance infrastructure for technology companies.',
+  areaServed: 'United States',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '30 N Gould St Ste N',
+    addressLocality: 'Sheridan',
+    addressRegion: 'WY',
+    postalCode: '82801',
+    addressCountry: 'US',
+  },
+};
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:site_name" content="Thriai" />
+  <meta name="theme-color" content="#0b1020" />
+  <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <nav>
+        <a class="logo" href="/" aria-label="Thriai home">thri<b>ai</b></a>
+        <div class="links">
+          <a href="/#services">Services</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/about" class="hide-sm">About</a>
+          <a href="/contact" class="btn primary">Book a call</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <main><slot /></main>
+  <footer>
+    <div class="wrap">
+      <div class="row">
+        <div>
+          <div class="logo">thri<b>ai</b></div>
+          <div>Finance leadership and AI-native systems for technology companies.</div>
+        </div>
+        <div>
+          <div><a href="/pricing">Pricing</a> · <a href="/about">About</a> · <a href="/contact">Contact</a></div>
+          <div><a href="mailto:hello@thriai.io">hello@thriai.io</a></div>
+        </div>
+      </div>
+      <p style="margin-top:22px">© {new Date().getFullYear()} Thriai LLC · Sheridan, Wyoming. Thriai provides finance advisory, FP&amp;A, and systems services. We do not provide audit, review, attest, or tax return preparation services.</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://thriai.io/sitemap-index.xml
