@@ -13,6 +13,9 @@ export function startFinanceScene(){
   const reach=document.querySelector<HTMLElement>('.reach-section');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   if(!opening||!hero)return;
+  const desktopStage=hero.parentElement!;
+  const heroAnchor=document.querySelector<HTMLElement>('[data-material-anchor=hero]');
+  const modelAnchor=document.querySelector<HTMLElement>('[data-material-anchor=model]');
   let values:Scenario|null=null,queued=0,ready=false,failed=false;
   const image=hero.querySelector('img')!;
   const money=(n:number)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
@@ -59,20 +62,25 @@ export function startFinanceScene(){
     const box=starting.map((n,i)=>lerp(lerp(n,aligned[i],arrival),modeled[i],reduced.matches?0:r));
     if(r>.01&&!reduced.matches)box[1]=Math.max(box[1],lowerTop);
     if(!mobile){
+      if(hero.parentElement!==desktopStage)desktopStage.append(hero);
       hero.style.left=`${box[0]}px`;hero.style.top=`${box[1]}px`;hero.style.width=`${box[2]}px`;hero.style.height=`${box[3]}px`;
       hero.style.setProperty('--art-scrim',String(1-smooth(arrival/.7)));
       hero.style.setProperty('--record-opacity',String(smooth((arrival-.18)/.4)*(1-smooth(model/.18))));
       hero.style.setProperty('--trace-opacity',String(model));
     }else{
+      // One object travels between two bounded document-flow slots. Switch only
+      // after the opening slot has left view, before the model slot arrives.
+      const anchor=reach&&reach.getBoundingClientRect().top<innerHeight?modelAnchor:heroAnchor;
+      if(anchor&&hero.parentElement!==anchor)anchor.append(hero);
       for(const property of ['left','top','width','height'])hero.style.removeProperty(property);
-      hero.style.setProperty('--record-opacity','0');hero.style.setProperty('--trace-opacity','0');
+      hero.style.setProperty('--record-opacity','0');hero.style.setProperty('--trace-opacity',anchor===modelAnchor?'1':'0');
     }
     hero.style.opacity='1';
-    const label=document.querySelector<HTMLElement>('.scene-index');if(label)label.style.opacity=String(1-smooth(arrival/.6));
+    const label=document.querySelector<HTMLElement>('.scene-index');if(label)label.style.opacity=String(mobile?0:1-smooth(arrival/.16));
     const sceneLabel=document.getElementById('scene-label');if(sceneLabel)sceneLabel.textContent='RECORDS / MODELS / DECISIONS';
     // Placement clears reading areas; no fading duplicate or viewport scrim is needed.
-    hero.parentElement?.style.setProperty('--scene-scrim','0');
-    slots.forEach(slot=>trace(slot,slot===hero?smooth((model-.25)/.75):1));
+    desktopStage.style.setProperty('--scene-scrim','0');
+    slots.forEach(slot=>trace(slot,slot===hero&&!mobile?smooth((model-.25)/.75):1));
   }
   function requestPaint(){if(!queued)queued=requestAnimationFrame(paint);}
   const activate=()=>{if(failed)return;ready=true;document.documentElement.dataset.instrumentRenderer='native-svg';requestPaint();};

@@ -18,6 +18,9 @@ does not define the service or establish a client result.
   Scroll position and validated synthetic assumptions determine each state;
   reversing the scroll must restore the same placement. Reduced motion keeps
   the opening artwork stable. This renderer does not require WebGL.
+  On mobile, the same artwork moves between bounded slots in normal document
+  flow below the hero and model headings. It must not remain behind scrolling
+  copy. Responsive changes return it to the desktop stage when appropriate.
 - `src/scripts/home.ts` owns the independent arithmetic and native fallback.
   Visual loading failure must not prevent calculation or navigation.
   Every displayed result and chart must clear when assumptions are invalid.

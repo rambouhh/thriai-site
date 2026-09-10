@@ -242,3 +242,16 @@
 @media(prefers-reduced-motion:reduce){.material-hero{transform:none!important}}
 @media(min-width:768px){.material-hero{mask-image:linear-gradient(90deg,transparent,#000 15%),linear-gradient(0deg,transparent,#000 5%,#000 98%,transparent);mask-composite:intersect}}
 @media(min-width:768px){.material-hero{mask-image:linear-gradient(90deg,transparent,#000 15%,#000 96%,transparent),linear-gradient(0deg,transparent,#000 6%,#000 95%,transparent)}}
+
+/* Mobile artwork occupies reading-flow slots, never the persistent text stage. */
+.mobile-material-slot{display:none}
+@media(max-width:767px){
+  .system-track .system-stage{position:absolute;top:0}
+  .system-stage .scene-index{display:none}
+  [data-instrument-renderer=native-svg] .mobile-material-slot{display:block;position:relative;height:230px;margin:12px -25px 16px;pointer-events:none}
+  .mobile-material-slot .material-hero{inset:0;height:100%;width:100%}
+  [data-instrument-renderer=native-svg] .builder-hero .hero-bottom{margin-top:0}
+  [data-instrument-renderer=native-svg] .builder-hero{min-height:0;padding-bottom:55px}
+  [data-instrument-renderer=native-svg] .reach-copy{margin-top:32px}
+  [data-instrument-renderer=native-svg] .reach-section .mobile-material-slot{margin-top:24px;margin-bottom:0}
+}
