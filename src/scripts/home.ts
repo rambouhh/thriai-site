@@ -2,6 +2,19 @@ const canvas = document.querySelector<HTMLCanvasElement>('#system-canvas');
 const opening = document.getElementById('opening');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+// The material establishing shot yields to the real, labeled scenario records.
+// This scene control is independent of WebGL availability and arithmetic.
+let materialFrame=0;
+const updateMaterialHero=()=>{
+  materialFrame=0;
+  const amount=reducedMotion.matches?0:Math.max(0,Math.min(1,-(opening?.getBoundingClientRect().top||0)/(innerHeight*.6)));
+  const progress=amount*amount*(3-2*amount);
+  document.documentElement.style.setProperty('--material-hero-opacity',String(1-progress));
+  document.documentElement.style.setProperty('--material-hero-travel',`${progress*35}px`);
+};
+const scheduleMaterialHero=()=>{if(!materialFrame)materialFrame=requestAnimationFrame(updateMaterialHero);};
+window.addEventListener('scroll',scheduleMaterialHero,{passive:true});window.addEventListener('resize',scheduleMaterialHero,{passive:true});window.addEventListener('pageshow',scheduleMaterialHero);reducedMotion.addEventListener('change',scheduleMaterialHero);updateMaterialHero();
+
 // The planes represent records, models and decisions. Their alignment is tied
 // directly to scroll position, so reverse scrolling and mid-page loads agree.
 if (canvas && opening) {
@@ -295,11 +308,11 @@ function updateWorkingStory(values:{cash:number;burn:number;hires:number;cost:nu
   write('decision',hires===0?'With no additional hires, this scenario keeps the current burn rate.':`${hires} ${hires===1?'hire adds':'hires add'} ${money(hires*cost)} to monthly burn and ${hires===1?'reduces':'reduce'} runway by ${(cash/burn-runway).toFixed(1)} months.`);
   const endpoint=(monthly:number)=>({x:20+440*Math.min(1,cash/(monthly*12)),y:25+140*Math.min(1,monthly*12/cash)});
   const base=endpoint(burn),plan=endpoint(total);
-  visual.querySelector('[data-scenario-path="base"]')?.setAttribute('d',`M20 25L${base.x} ${base.y}`);
-  visual.querySelector('[data-scenario-path="plan"]')?.setAttribute('d',`M20 25L${plan.x} ${plan.y}`);
-  visual.querySelector('[data-scenario-path="area"]')?.setAttribute('d',`M20 25L${plan.x} ${plan.y}L${plan.x} 165H20Z`);
-  visual.querySelector('[data-scenario-point="plan"]')?.setAttribute('cx',String(plan.x));
-  visual.querySelector('[data-scenario-point="plan"]')?.setAttribute('cy',String(plan.y));
+  visual.querySelectorAll('[data-scenario-path="base"]').forEach(node=>node.setAttribute('d',`M20 25L${base.x} ${base.y}`));
+  visual.querySelectorAll('[data-scenario-path="plan"]').forEach(node=>node.setAttribute('d',`M20 25L${plan.x} ${plan.y}`));
+  visual.querySelectorAll('[data-scenario-path="area"]').forEach(node=>node.setAttribute('d',`M20 25L${plan.x} ${plan.y}L${plan.x} 165H20Z`));
+  visual.querySelectorAll('[data-scenario-point="plan"]').forEach(node=>node.setAttribute('cx',String(plan.x)));
+  visual.querySelectorAll('[data-scenario-point="plan"]').forEach(node=>node.setAttribute('cy',String(plan.y)));
   refreshStorySummary();
 }
 

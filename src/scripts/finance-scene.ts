@@ -32,11 +32,13 @@ export function startFinanceScene(){
   const camera=new THREE.PerspectiveCamera(32,1,.1,100);
   const pmrem=new THREE.PMREMGenerator(renderer);
   const room=new RoomEnvironment();
+  const blueReflection=new THREE.Mesh(new THREE.PlaneGeometry(8,12),new THREE.MeshBasicMaterial({color:new THREE.Color(0x2564df).multiplyScalar(2.8)}));blueReflection.position.set(-6,1,2);blueReflection.lookAt(0,0,0);room.add(blueReflection);
+  const warmReflection=new THREE.Mesh(new THREE.PlaneGeometry(8,4),new THREE.MeshBasicMaterial({color:new THREE.Color(0xffb579).multiplyScalar(1.8)}));warmReflection.position.set(2,6,1);warmReflection.lookAt(0,0,0);room.add(warmReflection);
   const environment=pmrem.fromScene(room,.04,0.1,100,{size:128});
   scene.environment=environment.texture;
-  scene.environmentIntensity=.48;
+  scene.environmentIntensity=.7;
   room.dispose();pmrem.dispose();
-  const ambient=new THREE.HemisphereLight(0xb8d6ff,0x020713,.58);scene.add(ambient);
+  const ambient=new THREE.HemisphereLight(0xb8d6ff,0x020713,.25);scene.add(ambient);
   const key=new THREE.DirectionalLight(0xffe7ce,3.0);key.position.set(-4,8,5);key.castShadow=true;
   key.shadow.mapSize.set(mobile()?512:1024,mobile()?512:1024);
   Object.assign(key.shadow.camera,{left:-8,right:8,top:8,bottom:-8,near:1,far:30});
@@ -45,100 +47,69 @@ export function startFinanceScene(){
   const warm=new THREE.DirectionalLight(0xff995d,.65);warm.position.set(6,3,2);scene.add(warm);
   const instrument=new THREE.Group();scene.add(instrument);
 
-  // Fine physical roughness breaks large highlights; no image download needed.
   const grainCanvas=document.createElement('canvas');grainCanvas.width=128;grainCanvas.height=128;
-  const grainCtx=grainCanvas.getContext('2d')!;const grainData=grainCtx.createImageData(128,128);
-  let seed=247;for(let i=0;i<grainData.data.length;i+=4){seed=(seed*1664525+1013904223)>>>0;const v=170+(seed%70);grainData.data.set([v,v,v,255],i);}grainCtx.putImageData(grainData,0,0);
-  const grain=new THREE.CanvasTexture(grainCanvas);grain.wrapS=grain.wrapT=THREE.RepeatWrapping;grain.repeat.set(10,6);
-  const porcelain=new THREE.MeshPhysicalMaterial({color:0x06172e,metalness:.4,roughness:.34,roughnessMap:grain,clearcoat:.7,clearcoatRoughness:.22});
-  const cobalt=new THREE.MeshPhysicalMaterial({color:0x073b9c,metalness:.48,roughness:.29,roughnessMap:grain,bumpMap:grain,bumpScale:.012,clearcoat:.85,clearcoatRoughness:.17});
-  const copper=new THREE.MeshStandardMaterial({color:0xb3632d,metalness:.92,roughness:.29,roughnessMap:grain});
-  const dark=new THREE.MeshStandardMaterial({color:0x071328,metalness:.62,roughness:.36,roughnessMap:grain});
-  const chrome=new THREE.MeshStandardMaterial({color:0x95b4d8,metalness:.92,roughness:.23});
-  const glass=new THREE.MeshPhysicalMaterial({color:0x4b6d93,metalness:0,roughness:.10,transmission:mobile()?0:.42,transparent:true,opacity:.37,thickness:.8,ior:1.45,depthWrite:false});
-  const amber=new THREE.MeshPhysicalMaterial({color:0xf4a05a,metalness:.4,roughness:.18,clearcoat:1,emissive:0xad440e,emissiveIntensity:.14});
-
-  function box(w:number,h:number,d:number,material:THREE.Material,x=0,y=0,z=0,r=.1){
-    const mesh=new THREE.Mesh(new RoundedBoxGeometry(w,h,d,3,r),material);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;return mesh;
-  }
-  const foundation=new THREE.Group();instrument.add(foundation);
-  foundation.add(box(10.9,.48,4.6,dark,0,-.38,0,.13));
-  foundation.add(box(10.72,.12,4.45,chrome,0,-.08,0,.10));
-  foundation.add(box(10.60,.18,4.33,porcelain,0,.06,0,.10));
-  // Ceramic channels, recessed fasteners and a warm perimeter inlay give scale.
-  foundation.add(box(9.9,.015,.026,copper,0,.163,1.77,.006));
-  for(const x of [-5.02,5.02])for(const z of [-1.9,1.9]){
-    const screw=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.018,16),chrome);screw.position.set(x,.165,z);foundation.add(screw);
-    foundation.add(box(.055,.01,.009,dark,x,.181,z,.002));
-  }
-  for(let i=0;i<=12;i++){
-    foundation.add(box(.019,.012,i%3===0?.18:.10,chrome,-4+i*8/12,.17,1.52,.003));
-  }
-
-  const horizon=new THREE.Group();horizon.position.set(0,.20,-.25);instrument.add(horizon);
-  let liveBlue:THREE.Mesh|undefined,liveCopper:THREE.Mesh|undefined,liveGlass:THREE.Mesh|undefined;
-  const seams=new THREE.Group();horizon.add(seams);
-  const decision=new THREE.Group();horizon.add(decision);
-  const diamond=new THREE.Mesh(new THREE.OctahedronGeometry(.22,0),amber);diamond.rotation.z=Math.PI/4;diamond.castShadow=true;decision.add(diamond);
-  const decisionRing=new THREE.Mesh(new THREE.TorusGeometry(.31,.018,8,48),copper);decisionRing.rotation.x=-Math.PI/2;decisionRing.position.y=-.22;decision.add(decisionRing);
-
-  function textTexture(text:string,color='#c3d3ec',size=44){
-    const c=document.createElement('canvas');c.width=768;c.height=100;
-    const ctx=c.getContext('2d')!;ctx.font=`500 ${size}px Arial`;ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,384,52);
-    const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;
-  }
-  function decal(text:string,w:number,d:number,color?:string){
-    const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),new THREE.MeshBasicMaterial({map:textTexture(text,color),transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;return m;
-  }
-  const timeMark=decal('TODAY     ·     03     ·     06     ·     09     ·     MONTH 12',8.4,.30);timeMark.position.set(0,.185,1.95);foundation.add(timeMark);
+  const gc=grainCanvas.getContext('2d')!,gd=gc.createImageData(128,128);let seed=127;
+  for(let i=0;i<gd.data.length;i+=4){seed=(seed*1664525+1013904223)>>>0;const v=160+seed%85;gd.data.set([v,v,v,255],i);}gc.putImageData(gd,0,0);
+  const grain=new THREE.CanvasTexture(grainCanvas);grain.wrapS=grain.wrapT=THREE.RepeatWrapping;grain.repeat.set(6,4);
+  const ceramic=new THREE.MeshPhysicalMaterial({color:0x08172b,metalness:.40,roughness:.29,bumpMap:grain,bumpScale:.008,clearcoat:.8,clearcoatRoughness:.14});
+  const shell=new THREE.MeshPhysicalMaterial({color:0x09233f,metalness:.35,roughness:.28,bumpMap:grain,bumpScale:.018,clearcoat:1,clearcoatRoughness:.18});
+  const inset=new THREE.MeshStandardMaterial({color:0x08172b,metalness:.15,roughness:.45});
+  const silver=new THREE.MeshStandardMaterial({color:0x8ea7c3,metalness:.94,roughness:.24});
+  const copper=new THREE.MeshStandardMaterial({color:0xbe713d,metalness:.82,roughness:.25});
+  const blue=new THREE.MeshStandardMaterial({color:0x659bfa,metalness:.4,roughness:.3,emissive:0x143364,emissiveIntensity:.35});
+  const orange=new THREE.MeshPhysicalMaterial({color:0xffa264,metalness:.3,roughness:.16,clearcoat:1,emissive:0xa13f12,emissiveIntensity:.2});
+  const ink=new THREE.MeshStandardMaterial({color:0x102b53,metalness:.2,roughness:.5});
+  const glass=new THREE.MeshPhysicalMaterial({color:0x153154,roughness:.22,metalness:.18,transparent:true,opacity:.44,depthWrite:false});
+  function box(w:number,h:number,d:number,material:THREE.Material,x=0,y=0,z=0,r=.08){const m=new THREE.Mesh(new RoundedBoxGeometry(w,h,d,4,r),material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;return m;}
+  function tube(points:THREE.Vector3[],radius:number,mat:THREE.Material){return new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),Math.max(16,points.length*4),radius,8,false),mat);}
   const inputs=new THREE.Group();instrument.add(inputs);
-  const sourceTokens:THREE.Group[]=[];
-  ['CASH','MONTHLY BURN','PLANNED HIRES'].forEach((label,i)=>{
-    const token=new THREE.Group();token.position.set(-3.1+i*3.1,.22,2.9);
-    token.add(box(2.35,.28,.87,dark,0,0,0,.11));token.add(box(2.17,.06,.72,chrome,0,.17,0,.075));token.add(box(2.10,.04,.65,porcelain,0,.22,0,.05));
-    const name=decal(label,1.85,.28);name.position.y=.248;token.add(name);
-    const contact=box(.32,.08,.16,copper,0,.03,-.49,.018);token.add(contact);
+  const sourceTokens:THREE.Group[]=[];const valueTextures:THREE.CanvasTexture[]=[];const valueCanvases:HTMLCanvasElement[]=[];
+  const names=['CASH TODAY','MONTHLY BURN','PLANNED HIRES'];
+  for(let i=0;i<3;i++){
+    const token=new THREE.Group();
+    token.add(box(3.55,2.20,.9,shell,0,0,0,.30));
+    token.add(box(3.33,1.98,.24,ceramic,0,0,-.44,.10));
+    token.add(box(3.05,1.74,.14,inset,0,0,.43,.06));
+    token.add(box(.045,1.25,.018,i===0?blue:i===1?silver:copper,-1.39,0,.506,.008));
+    // Data lives on the physical record, prominently readable at normal size.
+    const c=document.createElement('canvas');c.width=1200;c.height=650;valueCanvases.push(c);
+    const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;valueTextures.push(t);
+    const face=new THREE.Mesh(new THREE.PlaneGeometry(2.77,1.47),new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false}));face.position.set(.07,0,.507);token.add(face);
+    for(const x of [-1.12,0,1.12])token.add(box(.33,.085,.18,silver,x,-1.14,-.15,.025));
     inputs.add(token);sourceTokens.push(token);
-  });
-  const tracks=new THREE.Group();instrument.add(tracks);
-  function tube(points:THREE.Vector3[],radius:number,mat:THREE.Material){return new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),24,radius,6,false),mat);}
-  for(const x of [-3.1,0,3.1]){
-    tracks.add(tube([new THREE.Vector3(x,.18,2.45),new THREE.Vector3(x,.18,1.7),new THREE.Vector3(x*.46,.18,.8),new THREE.Vector3(0,.18,.65)],.019,copper));
   }
-  const ground=new THREE.Mesh(new THREE.PlaneGeometry(40,30),new THREE.ShadowMaterial({opacity:.38}));ground.rotation.x=-Math.PI/2;ground.position.y=-.66;ground.receiveShadow=true;instrument.add(ground);
-
-  // Extruded 12-month cash mass. The endpoint truncates exactly at zero;
-  // negative month-12 cash remains explanatory HTML, never negative geometry.
-  function wedge(top:(month:number)=>number,bottom:(month:number)=>number,depth:number,stop=12){
-    const shape=new THREE.Shape();const samples=[0,...Array.from({length:12},(_,i)=>i+1).filter(n=>n<stop),stop];
-    shape.moveTo(-4,bottom(0));for(const t of samples)shape.lineTo(-4+t*8/12,top(t));
-    for(const t of [...samples].reverse())shape.lineTo(-4+t*8/12,bottom(t));shape.closePath();
-    const geo=new THREE.ExtrudeGeometry(shape,{depth,steps:1,bevelEnabled:true,bevelSegments:3,bevelSize:.045,bevelThickness:.045,curveSegments:1});geo.translate(0,0,-depth/2);return geo;
+  const calculation=new THREE.Group();instrument.add(calculation);
+  // A fine calibrated glass frame replaces the opaque triangular cash wall.
+  const frame=new THREE.Group();calculation.add(frame);
+  frame.add(box(8.6,4.7,.55,shell,0,.5,-.35,.20));
+  frame.add(box(8.20,4.3,.11,ink,0,.5,-.10,.05));
+  frame.add(box(8.05,4.14,.018,glass,0,.5,-.037,.008));
+  for(let i=0;i<=4;i++)frame.add(box(7.4,.009,.006,silver,0,-1+i*.8,-.035,.002));
+  for(let i=0;i<=12;i++)frame.add(box(.009,3.2,.005,ink,-3.7+i*7.4/12,.6,-.03,.002));
+  const contacts=new THREE.Group();instrument.add(contacts);
+  const paths:THREE.Mesh[]=[];
+  for(const x of [-2.7,0,2.7]){
+    const path=tube([new THREE.Vector3(x,-2.4,.06),new THREE.Vector3(x,-1.85,.06),new THREE.Vector3(x*.55,-1.5,.06),new THREE.Vector3(0,-1.3,.06)],.025,copper);contacts.add(path);paths.push(path);
   }
-  let valid=true;let values:Scenario={cash:1200000,burn:75000,hires:2,cost:10000};
+  const traceGroup=new THREE.Group();calculation.add(traceGroup);
+  const decision=new THREE.Mesh(new THREE.SphereGeometry(.13,24,16),orange);calculation.add(decision);
+  const decisionRing=new THREE.Mesh(new THREE.TorusGeometry(.24,.014,8,48),copper);calculation.add(decisionRing);
+  let planTrace:THREE.Mesh|undefined;let endpoint=new THREE.Vector3(3.7,-.9,.05);
+  let valid=true,values:Scenario={cash:1200000,burn:75000,hires:2,cost:10000};
   function rebuild(next:Scenario|null){
-    valid=!!next;horizon.visible=valid;
-    document.documentElement.dataset.instrumentState=valid?'valid':'invalid';
-    if(!next){requestPaint();return;}values=next;
-    for(const mesh of [liveBlue,liveCopper,liveGlass])if(mesh){horizon.remove(mesh);mesh.geometry.dispose();}
-    while(seams.children.length){const obj=seams.children.pop() as THREE.Mesh;obj.geometry.dispose();}
+    valid=!!next;document.documentElement.dataset.instrumentState=valid?'valid':'invalid';
+    if(next)values=next;
+    const money=(n:number)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+    const labels=valid?[money(values.cash),money(values.burn),`${values.hires} × ${money(values.cost)}`]:['—','—','—'];
+    valueCanvases.forEach((c,i)=>{const ctx=c.getContext('2d')!;ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#b2c5df';ctx.font='500 84px Arial';ctx.fillText(names[i],42,135);ctx.fillStyle='#edf4ff';ctx.font=`500 ${i===2?148:168}px Arial`;ctx.fillText(labels[i],38,345);ctx.fillStyle='#849dbf';ctx.font='500 48px Arial';ctx.fillText(i===0?'SOURCE 01':i===1?'SOURCE 02 / BEFORE HIRES':'SOURCE 03 / MONTHLY COST',42,520);valueTextures[i].needsUpdate=true;});
+    while(traceGroup.children.length){const child=traceGroup.children[0] as THREE.Mesh;traceGroup.remove(child);child.geometry.dispose();}
+    if(!next){requestPaint();return;}
     const {cash,burn,hires,cost}=next,total=burn+hires*cost;
-    const plan=(t:number)=>Math.max(0,1-total*t/cash)*2.45+.04;
-    const base=(t:number)=>Math.max(0,1-burn*t/cash)*2.45+.04;
-    const zero=Math.min(12,cash/total);
-    liveBlue=new THREE.Mesh(wedge(plan,()=>.04,1.5,zero),cobalt);liveBlue.castShadow=true;liveBlue.receiveShadow=true;horizon.add(liveBlue);
-    liveCopper=new THREE.Mesh(wedge(base,plan,.46,Math.min(12,cash/burn)),copper);liveCopper.position.z=.42;liveCopper.visible=hires>0;liveCopper.castShadow=true;horizon.add(liveCopper);
-    liveGlass=new THREE.Mesh(wedge(base,()=>.04,.22,Math.min(12,cash/burn)),glass);liveGlass.position.z=-1.02;horizon.add(liveGlass);
-    for(let m=1;m<zero;m++){
-      const x=-4+m*8/12;const groove=box(.010,Math.max(.05,plan(m)-.04),.006,dark,x,plan(m)/2,.799,.002);seams.add(groove);
-    }
-    // Quarter-cash contours stop where they meet the actual plan horizon.
-    // Together with month seams these are meaningful calibrated surface marks.
-    for(const fraction of [.25,.5,.75]){
-      const crossing=Math.min(12,cash*(1-fraction)/total),length=crossing*8/12;
-      if(length>.02)seams.add(box(length,.009,.008,porcelain,-4+length/2,.04+2.45*fraction,.800,.002));
-    }
-    decision.position.set(-4+zero*8/12,plan(zero)+.16,0);
+    const point=(t:number,monthly:number)=>new THREE.Vector3(-3.7+t*7.4/12,-1+Math.max(0,1-monthly*t/cash)*3.2,.08);
+    const stop=Math.min(12,cash/total),baseStop=Math.min(12,cash/burn);
+    endpoint=point(stop,total);const pp=Array.from({length:49},(_,i)=>point(stop*i/48,total));
+    planTrace=tube(pp,.035,orange);traceGroup.add(planTrace);
+    for(let t=0;t<baseStop;t+=.42){traceGroup.add(tube([point(t,burn),point(Math.min(t+.23,baseStop),burn)],.018,blue));}
     requestPaint();
   }
 
@@ -158,60 +129,49 @@ export function startFinanceScene(){
   function frameFor(slot:Slot){
     const rect=slot.canvas.getBoundingClientRect();
     const progress=reduced.matches?1:smooth((innerHeight*.96-rect.top)/(innerHeight*.65));
-    let yaw=-.33,pitch=0,explode=0,lift=0,cameraY=9,cameraZ=13,scale=1,targetY=.6;
-    instrument.position.set(0,0,0);instrument.rotation.set(0,0,0);
-    inputs.visible=true;tracks.visible=true;foundation.visible=true;ground.visible=true;
+    let assembly=1,model=1,resolve=1,yaw=-.12,scale=1,cameraY=2.5,cameraZ=15,targetY=-.15;
+    instrument.position.set(0,0,0);
     if(slot.kind==='opening'){
-      const d=delivery?smooth((innerHeight-delivery.getBoundingClientRect().top)/(innerHeight*.85)):0;
+      const d=delivery?smooth((innerHeight-delivery.getBoundingClientRect().top)/(innerHeight*.95)):0;
       const r=reach?smooth((innerHeight-reach.getBoundingClientRect().top)/(innerHeight*.9)):0;
-      const end=reach?smooth((innerHeight*.65-reach.getBoundingClientRect().bottom)/(innerHeight*.65)):0;
+      const reachHeading=reach?.querySelector('h2')?.getBoundingClientRect();
+      const modelArrival=reachHeading?smooth((innerHeight*.98-reachHeading.bottom)/(innerHeight*.48)):0;
+      assembly=d;model=modelArrival;resolve=smooth((modelArrival-.45)/.55);yaw=lerp(-.15,.05,d)-r*.12;scale=1.07+d*.90-model*.90;
+      targetY=lerp(lerp(-.15,-2,d),-.15,model);
       const presence=(el:HTMLElement|null)=>{if(!el)return 0;const b=el.getBoundingClientRect();return smooth((innerHeight-b.top)/(innerHeight*.9))*smooth(b.bottom/(innerHeight*.85));};
-      slot.canvas.parentElement?.style.setProperty('--scene-scrim',String(Math.max(presence(delivery)*.65,presence(reach)*.12)));
-      const label=document.querySelector<HTMLElement>('.scene-index');
-      if(label)label.style.opacity=String(delivery?smooth((delivery.getBoundingClientRect().top-innerHeight*.65)/(innerHeight*.35)):1);
-      const sceneLabel=document.getElementById('scene-label');if(sceneLabel)sceneLabel.textContent=r>.5?'03 / EXTEND THE EXPERTISE':d>.5?'02 / BUILD THE SYSTEM':'01 / CONNECT THE INFORMATION';
-      explode=reduced.matches?0:d*(1-r*.65);lift=reduced.matches?0:d*(1-r)+r*.25*(1-end);
-      yaw=lerp(-.62,.42,d)-r*.55+end*.2;cameraY=6+d*3+r*1.5;cameraZ=13.5-d*1.5+r*1.5;
-      scale=mobile()?1:.98-d*.20+r*.14;
+      slot.canvas.parentElement?.style.setProperty('--scene-scrim',String(Math.max(presence(delivery)*.42,presence(reach)*.08)));
+      const label=document.querySelector<HTMLElement>('.scene-index');if(label)label.style.opacity=String(delivery?smooth((delivery.getBoundingClientRect().top-innerHeight*.65)/(innerHeight*.35)):1);
+      const sceneLabel=document.getElementById('scene-label');if(sceneLabel)sceneLabel.textContent='RECORDS / MODELS / DECISIONS';
       if(!mobile()){
-        const heading=reach?.querySelector('h2')?.getBoundingClientRect();
-        const lowerTop=clamp((heading?.bottom??innerHeight*.55)+26,innerHeight*.35,innerHeight*.74);
-        const heroBox=[innerWidth*.49,innerHeight*.14,innerWidth*.61,innerHeight*.70];
-        const deliveryBox=[innerWidth*.70,innerHeight*.025,innerWidth*.30,innerHeight*.34];
+        const lowerTop=Math.max((reachHeading?.bottom??innerHeight*.5)+20,innerHeight*.34);
+        const heroBox=[innerWidth*.48,innerHeight*.13,innerWidth*.52,innerHeight*.73];
+        const deliveryBox=[innerWidth*.57,-innerHeight*.075,innerWidth*.42,innerHeight*.32];
         const reachBox=[innerWidth*.025,lowerTop,innerWidth*.51,innerHeight-lowerTop-20];
         const box=heroBox.map((n,i)=>lerp(lerp(n,deliveryBox[i],d),reachBox[i],r));
-        slot.canvas.style.left=`${box[0]}px`;slot.canvas.style.top=`${box[1]}px`;slot.canvas.style.width=`${box[2]}px`;slot.canvas.style.height=`${Math.max(170,box[3])}px`;
-        slot.canvas.style.opacity='1';
-      }else{
-        for(const key of ['left','top','width','height'])slot.canvas.style.removeProperty(key);
-      }
-      if(mobile()){cameraY=10;cameraZ=16;scale=.92;}
-      if(reduced.matches){yaw=-.35;explode=0;lift=0;cameraY=9;cameraZ=14;scale=mobile()?.92:.9;instrument.position.set(0,0,0);}
-      // Confine the mobile scene to the hero artwork window. Body copy has its
-      // own calm background; lower authored transformations use inline slots.
-      if(mobile()&&opening){slot.canvas.style.opacity=String(1-smooth((-opening.getBoundingClientRect().top-520)/220));}
+        if(r>.01)box[1]=Math.max(box[1],lowerTop);
+        slot.canvas.style.left=`${box[0]}px`;slot.canvas.style.top=`${box[1]}px`;slot.canvas.style.width=`${box[2]}px`;slot.canvas.style.height=`${Math.max(180,box[3])}px`;slot.canvas.style.opacity=String(reduced.matches?0:smooth(-(opening?.getBoundingClientRect().top||0)/(innerHeight*.6)));
+      }else{for(const key of ['left','top','width','height'])slot.canvas.style.removeProperty(key);slot.canvas.style.opacity=opening?String(1-smooth((-opening.getBoundingClientRect().top-520)/220)):'1';scale=.9;}
+      if(reduced.matches){assembly=0;model=0;resolve=0;yaw=-.12;}
     }else if(slot.kind==='proof'){
-      yaw=lerp(-.6,-.2,progress);explode=(1-progress)*.75;lift=(1-progress)*.7;cameraY=12;cameraZ=12;scale=1.02;
-    }else if(slot.kind==='horizon'){
-      yaw=lerp(-.48,-.05,progress);explode=(1-progress)*.65;lift=(1-progress)*1.1;cameraY=lerp(7,10,progress);cameraZ=14;scale=mobile()?1.1:1.75;
-    }else if(slot.kind==='scope'){
-      // Records withdraw from their sockets, while the copper hiring volume
-      // lifts from the blue plan: source / calculation / decision are distinct.
-      yaw=lerp(-.32,.28,progress);explode=progress*.95;lift=progress*.7;cameraY=7;cameraZ=15;scale=mobile()?1.1:1.44;targetY=1.5;
-    }else if(slot.kind==='closing'){
-      yaw=lerp(.28,-.5,progress);explode=(1-progress)*.9;lift=(1-progress)*.7;cameraY=7;cameraZ=13;scale=1.10;
+      assembly=1;model=1;resolve=progress;yaw=lerp(-.2,.04,progress);scale=1.15;cameraY=2;
     }
-    sourceTokens.forEach((token,i)=>{token.position.set(-3.1+i*3.1,.22+explode*(i===1?1.55:1.05),2.9+explode*.75);token.rotation.set(explode*-.12,explode*(i-1)*.1,0);});
-    if(liveCopper)liveCopper.position.y=lift*1.2;
-    if(liveGlass){liveGlass.position.y=lift*.35;liveGlass.position.z=-1.02-lift*.65;}
-    horizon.position.y=.20+explode*.23;
-    instrument.rotation.set(pitch,yaw,0);instrument.scale.setScalar(scale);
-    const actual=slot.canvas.getBoundingClientRect();const aspect=actual.width/actual.height;
-    camera.aspect=aspect;camera.fov=mobile()?36:32;
-    // Landscape slots fit the full physical horizon, portrait slots use a
-    // slightly greater camera distance rather than clipping essential geometry.
-    const fit=aspect<1.35?1.35/aspect:1;
-    camera.position.set(.3,cameraY*fit,cameraZ*fit);camera.lookAt(0,targetY,0);camera.updateProjectionMatrix();
+    // The exact same record capsules move into governed sockets and stay there.
+    // No preassembled model exists during the opening records state.
+    const loose=[[-2.15,1.45,.4],[1.0,.1,-.4],[2.35,-1.55,.65]];
+    sourceTokens.forEach((token,i)=>{
+      const dock=[-2.7+i*2.7,-2.65,.1];
+      token.position.set(lerp(loose[i][0],dock[0],assembly),lerp(loose[i][1],dock[1],assembly),lerp(loose[i][2],dock[2],assembly));
+      token.rotation.set(lerp(-.12,0,assembly),lerp([.50,-.18,.38][i],0,assembly),lerp((i-1)*.08,0,assembly));token.scale.setScalar(lerp(1,.68,assembly));
+    });
+    // Contact rails extend before the governed plotting field builds around them.
+    contacts.visible=assembly>.05;paths.forEach(path=>{const n=path.geometry.index?.count||0;path.geometry.setDrawRange(0,Math.floor(n*smooth(assembly)/3)*3);});
+    calculation.visible=model>.005&&valid;frame.scale.set(1,Math.max(.01,model),1);frame.position.y=-(1-model)*1.8;
+    traceGroup.visible=model>.85;
+    if(planTrace){const n=planTrace.geometry.index?.count||0;planTrace.geometry.setDrawRange(0,Math.floor(n*resolve/3)*3);}
+    const from=new THREE.Vector3(-3.7,2.2,.08);decision.position.copy(from).lerp(endpoint,resolve);decisionRing.position.copy(decision.position);decisionRing.scale.setScalar(lerp(1.8,1,resolve));decision.visible=decisionRing.visible=model>.85;
+    instrument.rotation.set(0,yaw,0);instrument.scale.setScalar(scale);
+    const actual=slot.canvas.getBoundingClientRect(),aspect=actual.width/actual.height;camera.aspect=aspect;camera.fov=32;
+    const fit=aspect<1.2?1.2/aspect:1;camera.position.set(.3,cameraY*fit,cameraZ*fit);camera.lookAt(0,targetY,0);camera.updateProjectionMatrix();
   }
   function paint(time:number){
     queued=0;if(disposed||document.hidden)return;
@@ -220,8 +180,9 @@ export function startFinanceScene(){
     if(time-lastPaint<32){queued=requestAnimationFrame(paint);return;}lastPaint=time;
     try{
       for(const slot of slots){
+        if(slot.kind==='opening')frameFor(slot);
         if(!slot.visible)continue;
-        frameFor(slot);
+        if(slot.kind!=='opening')frameFor(slot);
         const bounds=slot.canvas.getBoundingClientRect();if(bounds.width<1||bounds.height<1)continue;
         const ratio=Math.min(devicePixelRatio||1,mobile()?1.25:1.5);
         const w=Math.round(Math.min(bounds.width,1500)*ratio),h=Math.round(Math.min(bounds.height,950)*ratio);
