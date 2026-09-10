@@ -14,16 +14,22 @@ does not define the service or establish a client result.
   in the private Gauntlet run directory outside this application.
 - `src/scripts/finance-scene.ts` moves the same glass artwork through the opening,
   reveals native record labels and projects a live SVG trace onto its central
-  surface. The recognizable material and trace recur in the proof and brief.
+  surface. The glass artwork introduces the connected-finance visual language.
   Scroll position and validated synthetic assumptions determine each state;
   reversing the scroll must restore the same placement. Reduced motion keeps
   the opening artwork stable. This renderer does not require WebGL.
-  On mobile, the same artwork moves between bounded slots in normal document
-  flow below the hero and model headings. It must not remain behind scrolling
-  copy. Responsive changes return it to the desktop stage when appropriate.
+  On mobile, the artwork occupies a bounded slot in the hero's document flow.
+  It must not remain behind scrolling copy. Responsive changes return it to
+  the desktop stage when appropriate.
 - `src/scripts/home.ts` owns the independent arithmetic and native fallback.
   Visual loading failure must not prevent calculation or navigation.
   Every displayed result and chart must clear when assumptions are invalid.
+- The working demo keeps one H–01 hiring record and one cash graph mounted.
+  The record docks into the sheet while the hiring line reveals, then that
+  same sheet resolves into a decision brief. The inputs and numeric answers
+  remain live at every phase. Mobile uses a bounded sticky interval so the
+  operation is visible while the sheet is in view; reduced motion shows the
+  stable resolved sheet. Reverse scrolling must restore placement and reveal.
 - The main model, later cash chart and decision brief share the same assumptions.
   Charts stop at zero; the month-12 numeric result may be negative. Text explains
   that the example is simple arithmetic, not an AI recommendation.

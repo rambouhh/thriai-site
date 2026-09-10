@@ -280,6 +280,9 @@ function refreshStorySummary(){
 }
 function updateWorkingStory(values:{cash:number;burn:number;hires:number;cost:number}|null){
   window.dispatchEvent(new CustomEvent('thriai:scenario',{detail:values}));
+  const workingMoney=(n:number)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+  const workingValues=values?{hiring:`${values.hires} × ${workingMoney(values.cost)}`,additional:workingMoney(values.hires*values.cost),remaining:workingMoney(values.cash-(values.burn+values.hires*values.cost)*12)}:{hiring:'—',additional:'—',remaining:'—'};
+  document.querySelectorAll<HTMLElement>('[data-working-value]').forEach(node=>node.textContent=workingValues[node.dataset.workingValue as keyof typeof workingValues]);
   const visual=document.querySelector<HTMLElement>('.story-visual');
   if(!visual)return;
   const write=(key:string,value:string)=>visual.querySelectorAll<HTMLElement>(`[data-scenario="${key}"]`).forEach(node=>node.textContent=value);
@@ -325,3 +328,29 @@ document.fonts.ready.then(scheduleFinanceScenes);scheduleFinanceScenes();
 
 // Visual enhancement is isolated from all arithmetic and navigation.
 import('./finance-scene').then(({startFinanceScene})=>{try{startFinanceScene();}catch{/* Native artwork remains available. */}}).catch(()=>{});
+
+// One actual H–01 record docks into one actual graph and stays in its brief.
+// Scroll changes their arrangement; it never gates arithmetic or replaces DOM.
+const workingScene=document.querySelector<HTMLElement>('.demo-result');
+const workingWorkspace=document.querySelector<HTMLElement>('.demo-workspace');
+const workingJourney=document.querySelector<HTMLElement>('.working-journey');
+let workingFrame=0;
+const paintWorkingSequence=()=>{
+  workingFrame=0;if(!workingScene||!workingWorkspace)return;
+  const mobile=innerWidth<768;
+  const bounds=(mobile?(workingJourney||workingScene):workingWorkspace).getBoundingClientRect();
+  const clamp=(n:number)=>Math.max(0,Math.min(1,n));
+  const smooth=(n:number)=>{const t=clamp(n);return t*t*(3-2*t);};
+  const progress=reducedMotion.matches?1:mobile?clamp((12-bounds.top)/Math.max(240,(workingJourney?.offsetHeight||1060)-workingScene.offsetHeight)):clamp((70-bounds.top)/Math.max(300,workingWorkspace.offsetHeight-workingScene.offsetHeight));
+  const dock=smooth(progress/.55),resolve=smooth((progress-.58)/.42);
+  workingScene.style.setProperty('--dock',String(dock));workingScene.style.setProperty('--resolve',String(resolve));
+  workingJourney?.style.setProperty('--journey-dock',String(dock));
+  const endpoint=document.getElementById('cash-endpoint');
+  const endpointX=Number(endpoint?.getAttribute('cx')||520),endpointY=Number(endpoint?.getAttribute('cy')||138);
+  document.querySelector('[data-working-reveal]')?.setAttribute('width',String((endpointX-20)*dock));
+  if(endpoint)endpoint.style.transform=`translate(${(20-endpointX)*(1-dock)}px,${(24-endpointY)*(1-dock)}px)`;
+  workingScene.dataset.workingPhase=progress<.24?'record':progress<.8?'model':'decision';
+  workingScene.dataset.workingProgress=progress.toFixed(3);
+};
+const scheduleWorkingSequence=()=>{if(!workingFrame)workingFrame=requestAnimationFrame(paintWorkingSequence);};
+window.addEventListener('scroll',scheduleWorkingSequence,{passive:true});window.addEventListener('resize',scheduleWorkingSequence,{passive:true});window.addEventListener('pageshow',scheduleWorkingSequence);window.addEventListener('thriai:scenario',scheduleWorkingSequence);reducedMotion.addEventListener('change',scheduleWorkingSequence);document.fonts.ready.then(scheduleWorkingSequence);scheduleWorkingSequence();
