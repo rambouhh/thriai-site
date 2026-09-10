@@ -26,8 +26,12 @@ does not define the service or establish a client result.
   Every displayed result and chart must clear when assumptions are invalid.
 - The working demo keeps one H–01 hiring record and one cash graph mounted.
   The record docks into the sheet while the hiring line reveals, then that
-  same sheet resolves into a decision brief. The inputs and numeric answers
-  remain live at every phase. Mobile uses a bounded sticky interval so the
+  same sheet resolves into a decision brief. The initial sheet shows the
+  explicitly labeled baseline; docking applies the hiring record and draws
+  its changed forecast, then reveals the tradeoff. Financial values are never
+  interpolated. Editing inputs or choosing Show hiring result resolves the
+  answer immediately; forward navigation preserves it and deliberate reverse
+  scrolling replays the sequence. Mobile uses a bounded sticky interval so the
   operation is visible while the sheet is in view; reduced motion shows the
   stable resolved sheet. Reverse scrolling must restore placement and reveal.
 - The main model, later cash chart and decision brief share the same assumptions.

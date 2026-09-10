@@ -290,3 +290,10 @@
 @media(prefers-reduced-motion:reduce) and (max-width:767px){.working-journey{height:auto}.demo-result{height:650px}}
 .working-sheet:before{opacity:0}.demo-result[data-working-phase=decision] .working-sheet:before,.demo-result:not([data-working-phase]) .working-sheet:before{opacity:1}
 @media(max-width:767px){.sheet-decision-title .decision-long{display:none}}
+/* Baseline and applied arithmetic share a reading position, never a number tween. */
+.working-sheet [hidden]{display:none!important}
+.working-sheet #hiring-line{stroke-dashoffset:calc(1 - var(--forecast,1))}
+.working-skip{border:0;border-bottom:1px solid #91aaca;background:none;color:inherit;padding:7px 0 4px;margin-top:9px;font:400 12px/1.4 Space,sans-serif;cursor:pointer}.working-skip span{margin-left:12px}.working-skip:focus-visible{outline:2px solid #ebaf79;outline-offset:4px}
+.demo-result[data-hiring-state=unapplied] .working-record{box-shadow:0 2px 2px #f3bd7944 inset,0 18px 28px #071b3b55}
+.demo-result[data-hiring-state=unapplied] #baseline-line{stroke:#d6e5f6;stroke-width:3}
+.demo-result[data-working-phase] .sheet-model-title{opacity:1}.demo-result[data-working-phase] .sheet-decision-title{opacity:0}.demo-result[data-working-phase=decision] .sheet-model-title{opacity:0}.demo-result[data-working-phase=decision] .sheet-decision-title{opacity:1}

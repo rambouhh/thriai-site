@@ -279,6 +279,9 @@ function refreshStorySummary(){
   summary.textContent=visual.dataset.state==='invalid'?'Complete the demo inputs to update this scenario.':view==='sources'?`Cash ${visual.dataset.cash} · ${visual.dataset.hires} planned hires`:view==='model'?`${visual.dataset.runway} months of runway · ${visual.dataset.total}/month burn`:`Month 12 cash: ${visual.dataset.remaining}. Review timing and cash buffer.`;
 }
 function updateWorkingStory(values:{cash:number;burn:number;hires:number;cost:number}|null){
+  const baseline=values?values.cash/values.burn:0;
+  const baselineValues=values?{runway:baseline>=1000?new Intl.NumberFormat('en-US',{notation:'compact',maximumFractionDigits:1}).format(baseline):baseline.toFixed(1),remaining:new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(values.cash-values.burn*12)}:{runway:'—',remaining:'—'};
+  document.querySelectorAll<HTMLElement>('[data-baseline-value]').forEach(node=>node.textContent=baselineValues[node.dataset.baselineValue as keyof typeof baselineValues]);
   window.dispatchEvent(new CustomEvent('thriai:scenario',{detail:values}));
   const workingMoney=(n:number)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
   const workingValues=values?{hiring:`${values.hires} × ${workingMoney(values.cost)}`,additional:workingMoney(values.hires*values.cost),remaining:workingMoney(values.cash-(values.burn+values.hires*values.cost)*12)}:{hiring:'—',additional:'—',remaining:'—'};
@@ -334,23 +337,52 @@ import('./finance-scene').then(({startFinanceScene})=>{try{startFinanceScene();}
 const workingScene=document.querySelector<HTMLElement>('.demo-result');
 const workingWorkspace=document.querySelector<HTMLElement>('.demo-workspace');
 const workingJourney=document.querySelector<HTMLElement>('.working-journey');
-let workingFrame=0;
+let workingFrame=0,workingOverride=false;
 const paintWorkingSequence=()=>{
   workingFrame=0;if(!workingScene||!workingWorkspace)return;
   const mobile=innerWidth<768;
   const bounds=(mobile?(workingJourney||workingScene):workingWorkspace).getBoundingClientRect();
   const clamp=(n:number)=>Math.max(0,Math.min(1,n));
   const smooth=(n:number)=>{const t=clamp(n);return t*t*(3-2*t);};
-  const progress=reducedMotion.matches?1:mobile?clamp((12-bounds.top)/Math.max(240,(workingJourney?.offsetHeight||1060)-workingScene.offsetHeight)):clamp((70-bounds.top)/Math.max(300,workingWorkspace.offsetHeight-workingScene.offsetHeight));
+  const progress=reducedMotion.matches||workingOverride?1:mobile?clamp((12-bounds.top)/Math.max(240,(workingJourney?.offsetHeight||1060)-workingScene.offsetHeight)):clamp((70-bounds.top)/Math.max(300,workingWorkspace.offsetHeight-workingScene.offsetHeight));
   const dock=smooth(progress/.55),resolve=smooth((progress-.58)/.42);
+  const applied=progress>=.55,brief=progress>=.8,valid=workingScene.dataset.state!=='invalid';
+  const forecast=smooth((progress-.55)/.25);
+  workingScene.style.setProperty('--forecast',String(forecast));
+  workingScene.dataset.hiringState=applied?'applied':'unapplied';
+  workingScene.dataset.workingMode=reducedMotion.matches?'reduced':workingOverride?'interaction':'scroll';
+  const show=(selector:string,visible:boolean)=>workingScene.querySelectorAll<HTMLElement>(selector).forEach(node=>node.hidden=!visible);
+  show('[data-baseline-value]',!applied);show('#runway,[data-working-value="remaining"]',applied);
+  show('#decision-answer',brief||!valid);show('[data-working-explanation]',!brief&&valid);
+  show('[data-working-skip]',!brief&&valid);
+  const label=workingScene.querySelector<HTMLElement>('[data-runway-context]');
+  if(label)label.innerHTML=applied?'months of runway<br />with the planned hires':'months of runway<br />before planned hires';
+  const title=workingScene.querySelector<HTMLElement>('.sheet-model-title');if(title)title.textContent=applied?'HIRING APPLIED':mobile?'BEFORE HIRES':'BASELINE / NO HIRES';
+  const context=workingScene.querySelector<HTMLElement>('[data-answer-context]');if(context)context.textContent=brief?'THE TRADEOFF / SYNTHETIC SCENARIO':applied?'H–01 CONNECTED / SYNTHETIC':'H–01 NOT APPLIED / SYNTHETIC';
+  const explanation=workingScene.querySelector<HTMLElement>('[data-working-explanation]');if(explanation)explanation.textContent=applied?'The hiring cost now joins monthly burn. The copper forecast traces its effect on cash.':'Current burn only. H–01 has not yet been applied to this forecast.';
+  const recordLabel=workingScene.querySelector<HTMLElement>('.working-record-label');if(recordLabel)recordLabel.textContent=applied?'HIRES APPLIED / SYNTHETIC':'PLANNED / NOT YET APPLIED';
+  const legend=workingScene.querySelector<HTMLElement>('.legend-hire')?.parentElement;if(legend)legend.hidden=!applied;
+  const chart=workingScene.querySelector('.cash-chart');chart?.setAttribute('aria-label',applied?'Synthetic cash forecast: before and with planned hires.':'Synthetic baseline cash forecast, before planned hires.');
   workingScene.style.setProperty('--dock',String(dock));workingScene.style.setProperty('--resolve',String(resolve));
   workingJourney?.style.setProperty('--journey-dock',String(dock));
   const endpoint=document.getElementById('cash-endpoint');
   const endpointX=Number(endpoint?.getAttribute('cx')||520),endpointY=Number(endpoint?.getAttribute('cy')||138);
-  document.querySelector('[data-working-reveal]')?.setAttribute('width',String((endpointX-20)*dock));
-  if(endpoint)endpoint.style.transform=`translate(${(20-endpointX)*(1-dock)}px,${(24-endpointY)*(1-dock)}px)`;
+  document.querySelector('[data-working-reveal]')?.setAttribute('width',String((endpointX-20)*forecast));
+  if(endpoint){endpoint.style.transform=`translate(${(20-endpointX)*(1-forecast)}px,${(24-endpointY)*(1-forecast)}px)`;endpoint.style.visibility=forecast>0?'visible':'hidden';}
   workingScene.dataset.workingPhase=progress<.24?'record':progress<.8?'model':'decision';
   workingScene.dataset.workingProgress=progress.toFixed(3);
 };
 const scheduleWorkingSequence=()=>{if(!workingFrame)workingFrame=requestAnimationFrame(paintWorkingSequence);};
+const showWorkingResult=()=>{workingOverride=true;paintWorkingSequence();};
+form?.addEventListener('input',showWorkingResult);
+document.querySelector('[data-working-skip]')?.addEventListener('click',showWorkingResult);
+// Editing is immediate, including the forward trip from mobile inputs to the
+// result. Reverse navigation replays the sequence; focus scrolling does not.
+const resumeWorkingScroll=()=>{if(workingOverride){workingOverride=false;scheduleWorkingSequence();}};
+window.addEventListener('wheel',event=>{if(event.deltaY<0)resumeWorkingScroll();},{passive:true});
+let workingTouchY=0,workingScrollY=scrollY;
+window.addEventListener('touchstart',event=>{workingTouchY=event.touches[0]?.clientY||0;},{passive:true});
+window.addEventListener('touchmove',event=>{const y=event.touches[0]?.clientY||0;if(y>workingTouchY+2)resumeWorkingScroll();workingTouchY=y;},{passive:true});
+window.addEventListener('keydown',event=>{if((['PageUp','Home','ArrowUp'].includes(event.key)||(event.key===' '&&event.shiftKey))&&!(event.target instanceof HTMLInputElement))resumeWorkingScroll();});
+window.addEventListener('scroll',()=>{if(scrollY<workingScrollY-1&&!form?.contains(document.activeElement)&&document.activeElement!==document.querySelector('[data-working-skip]'))resumeWorkingScroll();workingScrollY=scrollY;},{passive:true});
 window.addEventListener('scroll',scheduleWorkingSequence,{passive:true});window.addEventListener('resize',scheduleWorkingSequence,{passive:true});window.addEventListener('pageshow',scheduleWorkingSequence);window.addEventListener('thriai:scenario',scheduleWorkingSequence);reducedMotion.addEventListener('change',scheduleWorkingSequence);document.fonts.ready.then(scheduleWorkingSequence);scheduleWorkingSequence();
