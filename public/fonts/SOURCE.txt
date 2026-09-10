@@ -1,0 +1,4 @@
+Space Grotesk by Florian Karsten, distributed under the SIL Open Font License 1.1.
+Source: https://github.com/google/fonts/tree/main/ofl/spacegrotesk
+Font files retrieved from Google Fonts on 2026-09-10 UTC.
+The accompanying OFL.txt is the upstream license, retained without modification.

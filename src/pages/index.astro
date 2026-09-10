@@ -1,110 +1,84 @@
 ---
 import Layout from '../layouts/Layout.astro';
+const comparisons = [
+  ['Senior expertise in selling and advising', 'Senior expertise applied directly to implementation'],
+  ['Requirements passed between teams', 'One operator connects judgment, architecture and execution'],
+  ['Capacity grows through more staffing', 'AI and reusable systems extend the senior builder’s reach'],
+  ['Implementation ends in a handoff', 'An ongoing relationship to run and improve the function'],
+];
 ---
-<Layout title="Thriai — Fractional CFO + AI-native finance platform for tech companies">
-  <section class="hero">
-    <div class="wrap">
-      <div class="eyebrow">Fractional CFO · AI Finance Platform · Revenue Systems</div>
-      <h1>Finance leadership that ships with its own data platform.</h1>
-      <p class="lead">Thriai is a fractional CFO firm for technology companies. Every client runs on a governed, AI-queryable finance stack, delivered by the same senior person who owns your numbers. No junior bench, no month-old templated reporting, no call-us pricing.</p>
-      <div class="cta">
-        <a class="btn primary" href="/contact">Book a 30-minute call</a>
-        <a class="btn ghost" href="/pricing">See published pricing</a>
-      </div>
-      <div class="stat-row">
-        <div><b>Business day 5</b>Close and reporting SLA</div>
-        <div><b>60+ checks</b>Automated tie-outs every month</div>
-        <div><b>Senior only</b>The person you hire does the work</div>
-        <div><b>Published</b>Pricing you can read before we talk</div>
-      </div>
+<Layout title="Thriai — Don't hire a consultant. Hire a builder.">
+  <div class="opening" id="opening">
+    <div class="system-stage" aria-hidden="true">
+      <div class="system-atmosphere"></div>
+      <div class="system-fallback"><i></i><i></i><i></i></div>
+      <canvas id="system-canvas"></canvas>
+      <div class="scene-index"><span class="scene-dot"></span> <span id="scene-label">01 / CONNECT THE INFORMATION</span></div>
     </div>
-  </section>
-
-  <section id="services">
-    <div class="wrap">
-      <div class="eyebrow">What we do</div>
-      <h2>Three practices, one platform, one relationship.</h2>
-      <p class="muted" style="max-width:64ch">Incumbent fractional CFO firms sell people. AI consultancies sell tools. Thriai sells both, from one team that has closed the month, survived diligence, and built production finance infrastructure.</p>
-      <div class="grid c3" style="margin-top:34px">
-        <div class="card">
-          <span class="tag hot">Core</span>
-          <h3>Fractional CFO</h3>
-          <p class="muted">Owned monthly close, 13-week cash, budget vs. actual, board packages, ARR and SaaS KPI reporting, rolling forecast, fundraise and diligence support, pricing and comp design.</p>
-          <ul>
-            <li>Retainers from $3.5K/mo</li>
-            <li>Pre-seed through PE-backed</li>
-            <li>Bookkeeping runs inside the QA-gated pipeline</li>
-          </ul>
-        </div>
-        <div class="card">
-          <span class="tag hot">Differentiator</span>
-          <h3>AI Finance Platform</h3>
-          <p class="muted">A governed warehouse, an ARR and KPI semantic layer, automated reporting, and AI access with guardrails. Built once from a proven template, tuned to your stack, yours to keep.</p>
-          <ul>
-            <li>Finance AI Assessment in 2 to 3 weeks</li>
-            <li>Platform build in 6 to 10 weeks</li>
-            <li>Agents for close prep, reporting, collections</li>
-          </ul>
-        </div>
-        <div class="card">
-          <span class="tag">Practice area</span>
-          <h3>Revenue Systems</h3>
-          <p class="muted">Quote-to-cash integrity, CRM and CPQ architecture, and GTM data that ties to the general ledger. Findings quantified in dollars, not slide decks.</p>
-          <ul>
-            <li>Quote-to-Cash Audit</li>
-            <li>ARR Data Quality Rebuild</li>
-            <li>BI stack with tie-out tests</li>
-          </ul>
-        </div>
+    <section class="builder-hero wrap" aria-labelledby="hero-heading">
+      <p class="eyebrow">Senior finance expertise.<br class="mobile-only" /> Hands-on AI implementation.</p>
+      <h1 id="hero-heading"><span>Don't hire</span><span>a consultant.</span><span class="builder-line">Hire a builder<span class="orange-period">.</span></span></h1>
+      <div class="hero-bottom"><p>Thriai designs, builds and runs your AI-native finance function. The senior expert who understands your business is the person implementing the systems—and stays involved in operating them.</p><div class="hero-actions"><a class="btn primary" href="#demo">See how it works <span aria-hidden="true">↓</span></a><a class="text-link" href="/contact">Talk about your business <span aria-hidden="true">↗</span></a></div></div>
+      <div class="hero-footnote"><span>JUDGMENT → SYSTEMS → DECISIONS</span><span>SCROLL TO CONNECT <b aria-hidden="true">↓</b></span></div>
+    </section>
+    <section class="delivery-section wrap" aria-labelledby="delivery-heading">
+      <div class="section-number">01 / THE DELIVERY MODEL</div>
+      <div class="delivery-heading"><h2 id="delivery-heading">A different<br />delivery model.</h2><p>The person who sees how it should work<br />is the person who builds it.</p></div>
+      <div class="comparison-table" role="table" aria-label="Comparison of delivery models">
+        <div class="comparison-row comparison-head" role="row"><span role="columnheader">A traditional consulting model</span><span role="columnheader">The Thriai approach <b aria-hidden="true">↗</b></span></div>
+        {comparisons.map(([before,after],i)=><div class="comparison-row" role="row"><span role="cell"><small>0{i+1}</small>{before}</span><span role="cell">{after}</span></div>)}
       </div>
-    </div>
-  </section>
+      <p class="comparison-note">A comparison of operating models; individual firms and engagements vary.</p>
+    </section>
+    <section class="reach-section wrap" aria-labelledby="reach-heading">
+      <div class="section-number">02 / WHY IT WORKS</div>
+      <h2 id="reach-heading">AI changes<br />what a senior<br />expert can <em>deliver.</em></h2>
+      <div class="reach-copy"><p>Experienced operators know how the pieces should fit together. AI gives a hands-on expert greater reach to build the connections.</p><p>Integrations. Automated workflows. Financial models. Information connected across the business. Senior judgment stays close to the work, from the first architectural decision through everyday operation.</p><p class="reach-statement">The expertise stays human.<br />The capacity keeps expanding.</p></div>
+    </section>
+    <div class="light-transition" aria-hidden="true"><span>INFORMATION BECOMES A DECISION.</span></div>
+  </div>
 
-  <section class="alt">
-    <div class="wrap">
-      <div class="eyebrow">Why it works</div>
-      <h2>Built the way finance should have been built all along.</h2>
-      <div class="grid c2" style="margin-top:30px">
-        <table>
-          <thead><tr><th>What buyers complain about</th><th>What Thriai does instead</th></tr></thead>
-          <tbody>
-            <tr><td>Senior sells, junior delivers</td><td><b>Senior-only delivery.</b> AI leverage replaces the junior bench.</td></tr>
-            <tr><td>Month-old templated reporting</td><td><b>Business-day-5 close</b> and live governed dashboards.</td></tr>
-            <tr><td>Ten-day closes, three-month onboardings</td><td><b>Template-repo onboarding</b> measured in days.</td></tr>
-            <tr><td>No help with systems</td><td><b>Revenue Systems practice</b> built in, not referred out.</td></tr>
-            <tr><td>Opaque call-us pricing</td><td><b>Published tiers.</b> Most competitors hide theirs.</td></tr>
-            <tr><td>AI pilots that die</td><td><b>Data foundation first.</b> Semantic layer and QA gates before any agent.</td></tr>
-          </tbody>
-        </table>
-        <div>
-          <h3>How an engagement runs</h3>
-          <div class="grid steps" style="gap:26px;margin-top:22px">
-            <div class="card"><b>Assess.</b> <span class="muted">Two to three weeks mapping your finance stack, data quality, and the highest-ROI automation candidates. You get a roadmap either way.</span></div>
-            <div class="card"><b>Build.</b> <span class="muted">Your client repo is cloned from a proven template: ingest from your books, payroll, billing, and CRM into a governed model with penny tie-outs.</span></div>
-            <div class="card"><b>Run.</b> <span class="muted">Monthly close, reporting, forecast, and board work on a retainer, with agents doing production and a human doing judgment.</span></div>
+  <div class="light-world">
+    <section class="proof-section wrap" aria-labelledby="proof-heading">
+      <div class="section-number">03 / FROM OPERATING EXPERIENCE TO WORKING SYSTEMS</div>
+      <div class="proof-intro"><h2 id="proof-heading">Built inside<br /><span>a real finance</span><br />function.</h2><div><p class="large-copy">The business judgment<br />and the ability to build it.</p><p>Thriai grew out of Eric Anderson’s hands-on work connecting finance, planning, revenue operations and AI at a mid-market SaaS company.</p><p>Eric combines that implementation experience with finance leadership, acquisition support and investor reporting. The person designing your finance function understands the decisions it needs to support.</p><a class="text-link" href="/about">Meet your builder <span aria-hidden="true">↗</span></a><p class="proof-disclosure">Founder operating experience, separate from Thriai client engagements.</p></div></div>
+      <div class="decision-demo" id="demo">
+        <div class="demo-heading"><div><span class="demo-badge"><i aria-hidden="true"></i> ILLUSTRATIVE WORKING DEMO</span><h3>Can we make<br />the next two hires?</h3></div><p>One question. Connected cash and hiring assumptions. Change an input and follow the decision through.</p></div>
+        <noscript><p class="notice">The scenario below is shown at its default assumptions. Enable JavaScript to adjust the inputs and recalculate.</p></noscript>
+        <div class="demo-workspace">
+          <form class="demo-inputs" id="scenario-form" aria-label="Illustrative hiring scenario">
+            <div class="demo-step">01 / THE INPUTS</div>
+            <label for="cash">Cash today <span>USD</span><div class="input-shell"><b>$</b><input id="cash" name="cash" type="number" min="10000" max="100000000" step="10000" value="1200000" required /></div></label>
+            <label for="burn">Monthly net cash burn <span>BEFORE HIRES</span><div class="input-shell"><b>$</b><input id="burn" name="burn" type="number" min="1000" max="10000000" step="1000" value="75000" required /></div></label>
+            <label for="hires">Planned hires <output for="hires" id="hire-count">2 people</output><input id="hires" name="hires" type="range" min="0" max="6" step="1" value="2" /></label>
+            <label for="hire-cost">Monthly cost per hire <span>FULLY LOADED</span><div class="input-shell"><b>$</b><input id="hire-cost" name="hireCost" type="number" min="1000" max="100000" step="500" value="10000" required /></div></label>
+            <p class="demo-error" id="demo-error" hidden>Enter positive amounts within the stated input limits to update this scenario.</p>
+          </form>
+          <div class="demo-result" aria-live="polite" aria-atomic="true">
+            <div class="demo-step">02 / CONNECT THE MODEL</div>
+            <div class="runway-number"><strong id="runway">12.6</strong><span>months of runway<br />with the planned hires</span></div>
+            <svg class="cash-chart" viewBox="0 0 540 180" role="img" aria-labelledby="chart-title"><title id="chart-title">Illustrative cash balance: current plan versus planned hires over 12 months.</title><defs><linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3761ff" stop-opacity=".17"/><stop offset="1" stop-color="#3761ff" stop-opacity="0"/></linearGradient></defs><path d="M20 24H520M20 80H520M20 138H520" stroke="#d9dfe6" fill="none"/><path id="cash-area" d="M20 24L520 132L520 138H20Z" fill="url(#chart-fill)"/><path id="baseline-line" d="M20 24L520 109.5" stroke="#9ea7b5" stroke-width="2" stroke-dasharray="5 5"/><path id="hiring-line" d="M20 24L520 132.3" stroke="#244df5" stroke-width="3"/><circle id="cash-endpoint" cx="520" cy="132.3" r="5" fill="#ff834a"/><text x="20" y="167">TODAY</text><text x="460" y="167">MONTH 12</text></svg>
+            <div class="chart-legend"><span><i class="legend-base"></i> Before hires</span><span><i class="legend-hire"></i> With hires</span></div>
+            <div class="demo-answer"><div class="demo-step">03 / SEE THE TRADEOFF</div><p id="decision-answer">Two hires add $20,000 to monthly burn and reduce runway by 3.4 months. At month 12, the model leaves $60,000 in cash.</p></div>
           </div>
         </div>
+        <details class="demo-assumptions"><summary>See the arithmetic and assumptions <span aria-hidden="true">+</span></summary><div><p id="formula">$1,200,000 ÷ ($75,000 + 2 × $10,000) = 12.6 months.</p><p>Synthetic inputs, not client data or a client result. Hires start immediately. Burn and employee costs stay constant; no revenue growth, financing, severance, hiring fees or interest. The chart covers 12 months and stops at zero. A real decision also needs timing, revenue scenarios and an agreed minimum cash buffer. This is an arithmetic demonstration, not an AI-generated recommendation.</p></div></details>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <div class="wrap">
-      <div class="eyebrow">Who it is for</div>
-      <h2>Technology companies between first revenue and first full-time CFO.</h2>
-      <div class="grid c3" style="margin-top:30px">
-        <div class="card"><h3>VC-backed SaaS, pre-seed to Series A</h3><p class="muted">$1M to $15M revenue. You need investor-grade numbers and a real close before you can afford a CFO. Foundation and Operate tiers, plus fundraise projects.</p></div>
-        <div class="card"><h3>PE-backed tech, $10M to $100M</h3><p class="muted">Sponsor reporting, ARR that ties, quote-to-cash that stops leaking. Strategic CFO, platform build, and the Quote-to-Cash Audit.</p></div>
-        <div class="card"><h3>PE sponsors and operating partners</h3><p class="muted">One relationship, many deployments. A standardized assessment across portfolio companies, then a repeatable finance data layer per company.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="alt tight">
-    <div class="wrap" style="text-align:center">
-      <h2>Start with a conversation, not a proposal.</h2>
-      <p class="muted">Thirty minutes. We will tell you whether the fit is real and what it would cost, in that order.</p>
-      <a class="btn primary" href="/contact">Book a call</a>
-    </div>
-  </section>
+    <section class="benefits-section wrap" aria-labelledby="benefits-heading">
+      <div class="section-number">04 / WHAT IT MAKES POSSIBLE</div>
+      <h2 id="benefits-heading">Build the foundation once.<br /><span>Keep expanding</span><br />what it can do.</h2>
+      <div class="benefit-rows"><article><span>01</span><h3>Preserve<br />runway.</h3><p>Automate recurring work, consolidate overlapping tools and reduce dependence on disconnected service providers. Put more of your budget toward building the business.</p></article><article><span>02</span><h3>Get answers while<br />decisions are still open.</h3><p>Bring financial and operating information together. Explore performance, cash and hiring with AI grounded in your company’s data, supported by an experienced finance operator.</p></article><article><span>03</span><h3>Be ready when the<br />questions get harder.</h3><p>Give your board, investors and external reviewers consistent reporting and a clear path to the underlying records. Carry that foundation into fundraising, diligence and your next stage.</p></article></div>
+    </section>
+    <section class="scope-section" id="services" aria-labelledby="scope-heading"><div class="wrap">
+      <div class="section-number">05 / A CONNECTED FINANCE FUNCTION</div>
+      <div class="scope-heading"><h2 id="scope-heading">Each part makes<br />the others<br /><em>more useful.</em></h2><p>The information that runs your books should inform your forecast, support a board discussion and help answer an investor’s question. We bring bookkeeping, cash operations, planning, reporting and systems into one operating approach.</p></div>
+      <div class="practice-list"><a href="/pricing"><span>01</span><div><h3>Fractional CFO</h3><p>The judgment. Financial leadership, planning and an ongoing operating relationship.</p></div><b aria-hidden="true">↗</b></a><a href="/pricing"><span>02</span><div><h3>AI Finance Platform</h3><p>The foundation. Connected information, automated workflows and useful AI access.</p></div><b aria-hidden="true">↗</b></a><a href="/pricing"><span>03</span><div><h3>Revenue Systems</h3><p>The connections. Revenue operations and financial data that work together.</p></div><b aria-hidden="true">↗</b></a></div>
+      <a class="text-link" href="/pricing">Explore scopes and published pricing <span aria-hidden="true">↗</span></a>
+    </div></section>
+    <section class="engagement-section wrap" aria-labelledby="engagement-heading"><div class="section-number">06 / AN ONGOING RELATIONSHIP</div><div class="engagement-grid"><h2 id="engagement-heading">Build.<br />Run.<br /><span>Keep improving.</span></h2><div><p class="large-copy">A stronger foundation.<br />An operator who stays.</p><p>We understand the business, take ownership of the agreed finance responsibilities and build the systems that support them. Then we operate the function and keep improving it as your needs and AI capabilities evolve.</p><p>Whether you are establishing finance for the first time or giving an existing team a stronger foundation, the relationship starts with where you want the business to go.</p><div class="engagement-terms"><span>Defined scope</span><span>Published pricing</span><span>Your systems</span></div></div></div></section>
+  </div>
+  <section class="closing-section"><div class="closing-beam" aria-hidden="true"></div><div class="wrap"><span class="section-number">THE NEXT STAGE STARTS HERE</span><h2>Build the finance<br />function your<br /><span>next stage needs.</span></h2><div class="closing-bottom"><p>Tell us where the business is today<br />and what you want it to become.</p><a class="btn primary" href="/contact">Talk about your business <span aria-hidden="true">↗</span></a></div></div></section>
+  <script>import '../scripts/home';</script>
 </Layout>

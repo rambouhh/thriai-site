@@ -1,76 +1,57 @@
 ---
 import '../styles/global.css';
 interface Props { title: string; description?: string; }
-const {
-  title,
-  description = 'Thriai is a fractional CFO firm for technology companies where every client runs on a governed, AI-queryable finance platform. Senior-only delivery, published pricing.',
-} = Astro.props;
+const { title, description = 'Thriai designs, builds and runs your AI-native finance function. Senior finance expertise, applied directly to the systems that move your business forward.' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ld = {
-  '@context': 'https://schema.org',
-  '@type': 'ProfessionalService',
-  name: 'Thriai LLC',
-  url: 'https://thriai.io',
-  email: 'hello@thriai.io',
-  description: 'Fractional CFO leadership and AI-native finance infrastructure for technology companies.',
-  areaServed: 'United States',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: '30 N Gould St Ste N',
-    addressLocality: 'Sheridan',
-    addressRegion: 'WY',
-    postalCode: '82801',
-    addressCountry: 'US',
-  },
-};
+const home = Astro.url.pathname === '/';
+const ld = { '@context':'https://schema.org', '@type':'ProfessionalService', name:'Thriai LLC', url:'https://thriai.io', email:'hello@thriai.io', description:'Senior finance leadership and hands-on AI-native finance systems implementation.', areaServed:'United States' };
 ---
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{title}</title>
-  <meta name="description" content={description} />
-  <link rel="canonical" href={canonical} />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="sitemap" href="/sitemap-index.xml" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
-  <meta property="og:url" content={canonical} />
-  <meta property="og:site_name" content="Thriai" />
-  <meta name="theme-color" content="#0b1020" />
-  <script type="application/ld+json" set:html={JSON.stringify(ld)} />
-</head>
-<body>
-  <header>
-    <div class="wrap">
-      <nav>
-        <a class="logo" href="/" aria-label="Thriai home">thri<b>ai</b></a>
-        <div class="links">
-          <a href="/#services">Services</a>
-          <a href="/pricing">Pricing</a>
-          <a href="/about" class="hide-sm">About</a>
-          <a href="/contact" class="btn primary">Book a call</a>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" href="/fonts/space-grotesk-bold.ttf" as="font" type="font/ttf" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Thriai" />
+    <meta name="theme-color" content="#080b10" />
+    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  </head>
+  <body class:list={[home ? 'home-page' : 'interior-page']}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <nav class="wrap" aria-label="Main navigation">
+        <a class="logo" href="/" aria-label="Thriai home">thri<span>ai</span><i aria-hidden="true">✳</i></a>
+        <span class="nav-descriptor">FINANCE. BUILT TOGETHER.</span>
+        <button class="menu-toggle" aria-expanded="false" aria-controls="nav-links">Menu <span aria-hidden="true">+</span></button>
+        <div class="links" id="nav-links">
+          <a href="/#services">Services</a><a href="/pricing">Pricing</a><a href="/about">About</a>
+          <a href="/contact" class="nav-contact">Let's build <span aria-hidden="true">↗</span></a>
         </div>
       </nav>
-    </div>
-  </header>
-  <main><slot /></main>
-  <footer>
-    <div class="wrap">
-      <div class="row">
-        <div>
-          <div class="logo">thri<b>ai</b></div>
-          <div>Finance leadership and AI-native systems for technology companies.</div>
-        </div>
-        <div>
-          <div><a href="/pricing">Pricing</a> · <a href="/about">About</a> · <a href="/contact">Contact</a></div>
-          <div><a href="mailto:hello@thriai.io">hello@thriai.io</a></div>
-        </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <div class="footer-top"><a class="logo" href="/">thri<span>ai</span><i aria-hidden="true">✳</i></a><p>Senior judgment.<br />Hands-on implementation.</p><div class="footer-links"><a href="/pricing">Pricing ↗</a><a href="/about">About ↗</a><a href="/contact">Contact ↗</a><a href="mailto:hello@thriai.io">hello@thriai.io ↗</a></div></div>
+        <div class="footer-bottom"><p>© {new Date().getFullYear()} Thriai LLC · Sheridan, Wyoming</p><p>Finance advisory, FP&amp;A and systems services. We do not provide audit, review, attest or tax return preparation services.</p></div>
       </div>
-      <p style="margin-top:22px">© {new Date().getFullYear()} Thriai LLC · Sheridan, Wyoming. Thriai provides finance advisory, FP&amp;A, and systems services. We do not provide audit, review, attest, or tax return preparation services.</p>
-    </div>
-  </footer>
-</body>
+    </footer>
+    <script>
+      const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+      const links = document.getElementById('nav-links');
+      const closeMenu = () => { toggle?.setAttribute('aria-expanded','false'); links?.classList.remove('is-open'); };
+      toggle?.addEventListener('click', () => { const open = toggle.getAttribute('aria-expanded') !== 'true'; toggle.setAttribute('aria-expanded', String(open)); links?.classList.toggle('is-open',open); });
+      links?.querySelectorAll('a').forEach(link => link.addEventListener('click',closeMenu));
+      document.addEventListener('keydown', e => { if(e.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') { closeMenu(); toggle.focus(); } });
+    </script>
+  </body>
 </html>
