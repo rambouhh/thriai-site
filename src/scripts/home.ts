@@ -35,12 +35,15 @@ if (canvas && opening) {
       stage?.style.setProperty('--scene-scrim',scrim.toFixed(3));
       const labelAlpha = deliveryBounds ? smooth((deliveryBounds.top-height*.65)/(height*.35)) : 1;
       if(sceneIndex)sceneIndex.style.opacity=String(labelAlpha);
-      const bluePhase = clamp((p - .35) / .5);
-      const scale = (mobile ? width * .00105 : Math.min(width * .00067,1.16)) * (1 + bluePhase * .18);
-      const centerX = width * (mobile ? .60 - bluePhase * .1 : .76 - bluePhase * .40);
-      const centerY = height * (mobile ? .49 + bluePhase * .12 : .49 + bluePhase * .08);
-      const spin = -.36 + p * .59;
-      const tilt = .86 - bluePhase * .18;
+      const deliveryArrival=deliveryBounds?smooth((height-deliveryBounds.top)/(height*.85)):0;
+      const reachArrival=reachBounds?smooth((height-reachBounds.top)/(height*.9)):0;
+      const handoff=reachBounds?smooth((height*.6-reachBounds.bottom)/(height*.7)):0;
+      const bluePhase = reachArrival;
+      const scale = (mobile ? width * .00105 : Math.min(width * .00067,1.16)) * (1 - deliveryArrival*.29 + reachArrival*.40 - handoff*.2);
+      const centerX = width * (mobile ? .60 - bluePhase * .1 : .76 + deliveryArrival*.16 - reachArrival*.53 + handoff*.12);
+      const centerY = height * (mobile ? .49 + bluePhase * .12 : .49 - deliveryArrival*.19 + reachArrival*.36 + handoff*.10);
+      const spin = -.36 + deliveryArrival*.60 - reachArrival*.15 + handoff*.18;
+      const tilt = .86 + deliveryArrival*.18 - reachArrival*.40 + handoff*.65;
       ctx.clearRect(0,0,width,height);
       const atmosphere = ctx.createRadialGradient(centerX,centerY,0,centerX,centerY,Math.max(width,height)*.7);
       atmosphere.addColorStop(0,`rgba(22,64,${145 + Math.round(bluePhase*100)},${.16+bluePhase*.5})`);
@@ -54,7 +57,7 @@ if (canvas && opening) {
         return {x:centerX+rotX*scale*persp,y:centerY+ry*scale*persp,z:rz};
       };
       const path = (points:{x:number,y:number}[]) => {ctx.beginPath();points.forEach((v,i)=>i?ctx.lineTo(v.x,v.y):ctx.moveTo(v.x,v.y));};
-      const separation=195+Math.sin(p*Math.PI)*62;
+      const separation=195-deliveryArrival*133+reachArrival*172-handoff*175;
       const layers = [
         {y:separation,size:270,offset:-210,color:'65,111,255'},
         {y:0,size:265,offset:-60,color:'98,151,255'},
@@ -293,33 +296,28 @@ function updateWorkingStory(values:{cash:number;burn:number;hires:number;cost:nu
   const base=endpoint(burn),plan=endpoint(total);
   visual.querySelector('[data-scenario-path="base"]')?.setAttribute('d',`M20 25L${base.x} ${base.y}`);
   visual.querySelector('[data-scenario-path="plan"]')?.setAttribute('d',`M20 25L${plan.x} ${plan.y}`);
+  visual.querySelector('[data-scenario-path="area"]')?.setAttribute('d',`M20 25L${plan.x} ${plan.y}L${plan.x} 165H20Z`);
   visual.querySelector('[data-scenario-point="plan"]')?.setAttribute('cx',String(plan.x));
   visual.querySelector('[data-scenario-point="plan"]')?.setAttribute('cy',String(plan.y));
   refreshStorySummary();
 }
-const story=document.querySelector<HTMLElement>('.working-story');
-const storyVisual=document.querySelector<HTMLElement>('.story-visual');
-if(story&&storyVisual){
-  const stack=storyVisual.querySelector<HTMLElement>('.scenario-stack');
-  const panes=Array.from(storyVisual.querySelectorAll<HTMLElement>('[data-sheet]'));
-  const viewButtons=Array.from(storyVisual.querySelectorAll<HTMLButtonElement>('[data-story-view]'));
-  const scopeChapter=story.querySelector<HTMLElement>('.scope-section');
-  const engagementChapter=story.querySelector<HTMLElement>('.engagement-section');
-  const chooseView=(view:string)=>{
-    if(stack)stack.dataset.view=view;
-    panes.forEach(pane=>{const active=pane.dataset.sheet===view;pane.classList.toggle('is-active',active);pane.setAttribute('aria-hidden',String(!active));});
-    viewButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.storyView===view)));
-    refreshStorySummary();
-  };
-  viewButtons.forEach(button=>button.addEventListener('click',()=>chooseView(button.dataset.storyView||'sources')));
-  let lastChapter='',scheduled=false;
-  const updateStory=()=>{
-    scheduled=false;
-    if(reducedMotion.matches)return;
-    const rest=window.innerHeight*.53;
-    const view=(engagementChapter?.getBoundingClientRect().top??Infinity)<rest?'brief':(scopeChapter?.getBoundingClientRect().top??Infinity)<rest?'model':'sources';
-    if(view!==lastChapter){lastChapter=view;chooseView(view);}
-  };
-  const scheduleStory=()=>{if(!scheduled){scheduled=true;requestAnimationFrame(updateStory);}};
-  window.addEventListener('scroll',scheduleStory,{passive:true});window.addEventListener('resize',scheduleStory,{passive:true});window.addEventListener('pageshow',scheduleStory);reducedMotion.addEventListener('change',scheduleStory);document.fonts.ready.then(scheduleStory);scheduleStory();
-}
+
+// Natural-scroll arrivals: each folio opens while entering, then rests fully
+// readable. No pinned chapter, timer, or hidden text controls reading speed.
+const financeScenes=Array.from(document.querySelectorAll<HTMLElement>('[data-finance-scene]'));
+let financeFrame=0;
+const renderFinanceScenes=()=>{
+  financeFrame=0;
+  financeScenes.forEach(scene=>{
+    const material=scene.querySelector('.runway-landscape,.finance-folio,.open-brief')||scene;
+    const bounds=material.getBoundingClientRect();
+    const entry=reducedMotion.matches?1:Math.max(0,Math.min(1,(window.innerHeight-bounds.top)/(window.innerHeight*.75)));
+    scene.style.setProperty('--arrival',String(entry*entry*(3-2*entry)));
+  });
+};
+const scheduleFinanceScenes=()=>{if(!financeFrame)financeFrame=requestAnimationFrame(renderFinanceScenes);};
+window.addEventListener('scroll',scheduleFinanceScenes,{passive:true});
+window.addEventListener('resize',scheduleFinanceScenes,{passive:true});
+window.addEventListener('pageshow',scheduleFinanceScenes);
+reducedMotion.addEventListener('change',scheduleFinanceScenes);
+document.fonts.ready.then(scheduleFinanceScenes);scheduleFinanceScenes();
