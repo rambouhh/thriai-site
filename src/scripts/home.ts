@@ -240,6 +240,7 @@ if(form){
       if(error){error.textContent=`${names[invalid.id]}: ${issue}. Results will update when all inputs are valid.`;error.hidden=false;}
       if(result)result.dataset.state='invalid';
       setText('runway','—');setText('decision-answer','Complete the highlighted input to calculate this scenario.');setText('formula','The scenario is incomplete. No current result is available.');setText('chart-title','No current chart: complete all scenario inputs to calculate.');
+      updateWorkingStory(null);
       return;
     }
     if(error)error.hidden=true;
@@ -249,6 +250,7 @@ if(form){
     const additional=hires*cost,total=burn+additional,runway=cash/total,baseline=cash/burn,remaining=cash-total*12;
     const niceRunway = runway>=1000 ? new Intl.NumberFormat('en-US',{notation:'compact',maximumFractionDigits:1}).format(runway) : runway.toFixed(1);
     setText('hire-count',`${hires} ${hires===1?'person':'people'}`);setText('runway',niceRunway);
+    updateWorkingStory({cash,burn,hires,cost});
     const impact=hires===0 ? 'With no additional hires, the scenario keeps the current burn rate.' : `${hires} ${hires===1?'hire adds':'hires add'} ${currency(additional)} to monthly burn and ${hires===1?'reduces':'reduce'} runway by ${(baseline-runway).toFixed(1)} months.`;
     const outcome=remaining>=0 ? `At month 12, the model leaves ${currency(remaining)} in cash.` : `Cash reaches zero after ${runway.toFixed(1)} months, before the 12-month horizon.`;
     setText('decision-answer',`${impact} ${outcome}`);
@@ -261,70 +263,63 @@ if(form){
     document.getElementById('cash-endpoint')?.setAttribute('cx',String(plan.x));document.getElementById('cash-endpoint')?.setAttribute('cy',String(plan.y));
     setText('chart-title',`Illustrative cash balance. Before hires, ${baseline.toFixed(1)} months of runway. With ${hires} hires, ${runway.toFixed(1)} months of runway. Chart horizon is 12 months.`);
   };
-  form.addEventListener('input',update);form.addEventListener('submit',e=>e.preventDefault());update();
+  form.addEventListener('input',()=>{update(); const signal=document.querySelector<HTMLElement>('.model-signal');if(signal&&!reducedMotion.matches)signal.animate([{transform:'scaleX(0)',opacity:.8},{transform:'scaleX(1)',opacity:1},{transform:'scaleX(1)',opacity:0}],{duration:650,easing:'ease-out'});});form.addEventListener('submit',e=>e.preventDefault());update();
 }
 
-// The light chapters continue the same reversible visual argument. Geometry
-// updates only on scrolling/resizing; all prose and static structure stay visible.
-const editorial = document.querySelector<HTMLElement>('.benefits-editorial');
-const trailSvg = document.querySelector<SVGSVGElement>('.trail-connections');
-const cycleFigure = document.querySelector<HTMLElement>('.operating-cycle');
-if (editorial && trailSvg && cycleFigure) {
-  const clampProgress = (n:number) => Math.max(0,Math.min(1,n));
-  const easeProgress = (n:number) => {const t=clampProgress(n);return t*t*(3-2*t);};
-  const trailPaths = Array.from(trailSvg.querySelectorAll<SVGPathElement>('g[stroke] > path'));
-  const articles = Array.from(editorial.querySelectorAll<HTMLElement>('.benefit-rows article'));
-  const sources = Array.from(editorial.querySelectorAll<HTMLElement>('.trail-sources span'));
-  const traces = trailPaths.map(path => {
-    const overlay = path.cloneNode(true) as SVGPathElement;
-    overlay.classList.add('trail-progress');
-    overlay.setAttribute('aria-hidden','true');
-    path.classList.add('trail-track');
-    path.parentElement?.appendChild(overlay);
-    const length = path.getTotalLength();
-    overlay.style.strokeDasharray=String(length);
-    return {overlay,length};
-  });
-  const cycleSvg=cycleFigure.querySelector<SVGSVGElement>('svg');
-  const cycleArcs=Array.from(cycleSvg?.querySelectorAll<SVGPathElement>(':scope > path') || []).slice(0,3);
-  const cycleWords=Array.from(cycleSvg?.querySelectorAll<SVGTextElement>('.cycle-words text') || []);
-  const marker=cycleSvg?.querySelector<SVGCircleElement>('.cycle-marker');
-  const arcLengths=cycleArcs.map(arc=>arc.getTotalLength());
-  cycleArcs.forEach(arc=>arc.classList.add('operating-arc'));
-  let pending=false;
-  const updateEditorial=()=>{
-    pending=false;
-    const still=reducedMotion.matches;
-    editorial.classList.toggle('scroll-story-active',!still);
-    cycleFigure.classList.toggle('scroll-story-active',!still);
-    const viewport=window.innerHeight;
-    const trailBox=trailSvg.closest('figure')?.getBoundingClientRect();
-    const phoneProgress=trailBox?clampProgress((viewport*.8-trailBox.top)/(viewport*.8+trailBox.height*.15)):1;
-    traces.forEach(({overlay,length},i)=>{
-      const top=articles[i]?.getBoundingClientRect().top ?? 0;
-      const progress=still?1:window.innerWidth<768?easeProgress(phoneProgress*3-i):easeProgress((viewport*.83-top)/(viewport*.64));
-      overlay.style.strokeDashoffset=String(length*(1-progress));
-      sources[i]?.style.setProperty('--source-progress',String(progress));
-    });
-    const box=cycleFigure.getBoundingClientRect();
-    const progress=clampProgress((viewport*.85-box.top)/(viewport*.65+box.height*.5));
-    const phase=Math.min(2,Math.floor(progress*3));
-    cycleArcs.forEach((arc,i)=>arc.classList.toggle('is-current',!still&&i===phase));
-    cycleWords.forEach((word,i)=>word.classList.toggle('is-current',!still&&i===phase));
-    if(marker&&cycleArcs.length===3){
-      if(still){marker.setAttribute('cx','422');marker.setAttribute('cy','118');}
-      else{
-        const local=clampProgress(progress*3-phase);
-        const point=cycleArcs[phase].getPointAtLength(arcLengths[phase]*local);
-        marker.setAttribute('cx',String(point.x));marker.setAttribute('cy',String(point.y));
-      }
-    }
+// One real synthetic scenario supplies every later material view. This is a
+// projection of the demo's values, not a second model or an invented report.
+function refreshStorySummary(){
+  const visual=document.querySelector<HTMLElement>('.story-visual');
+  const view=visual?.querySelector<HTMLElement>('.scenario-stack')?.dataset.view||'sources';
+  const summary=visual?.querySelector<HTMLElement>('[data-scenario="mobile"]');
+  if(!visual||!summary)return;
+  summary.textContent=visual.dataset.state==='invalid'?'Complete the demo inputs to update this scenario.':view==='sources'?`Cash ${visual.dataset.cash} · ${visual.dataset.hires} planned hires`:view==='model'?`${visual.dataset.runway} months of runway · ${visual.dataset.total}/month burn`:`Month 12 cash: ${visual.dataset.remaining}. Review timing and cash buffer.`;
+}
+function updateWorkingStory(values:{cash:number;burn:number;hires:number;cost:number}|null){
+  const visual=document.querySelector<HTMLElement>('.story-visual');
+  if(!visual)return;
+  const write=(key:string,value:string)=>visual.querySelectorAll<HTMLElement>(`[data-scenario="${key}"]`).forEach(node=>node.textContent=value);
+  if(!values){visual.dataset.state='invalid';['cash','burn','hires','cost','runway','total','remaining'].forEach(key=>write(key,'—'));write('decision','Complete the highlighted demo input to calculate this scenario.');refreshStorySummary();return;}
+  visual.dataset.state='valid';
+  const {cash,burn,hires,cost}=values;
+  const money=(n:number)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+  const total=burn+hires*cost,runway=cash/total,remaining=cash-total*12;
+  const runwayLabel=runway>=1000?new Intl.NumberFormat('en-US',{notation:'compact',maximumFractionDigits:1}).format(runway):runway.toFixed(1);
+  const entries={cash:money(cash),burn:money(burn),hires:`${hires} ${hires===1?'person':'people'}`,cost:money(cost),runway:runwayLabel,total:money(total),remaining:money(remaining)};
+  Object.entries(entries).forEach(([key,value])=>write(key,value));
+  Object.assign(visual.dataset,{cash:money(cash),hires:String(hires),runway:runwayLabel,total:money(total),remaining:money(remaining)});
+  write('decision',hires===0?'With no additional hires, this scenario keeps the current burn rate.':`${hires} ${hires===1?'hire adds':'hires add'} ${money(hires*cost)} to monthly burn and ${hires===1?'reduces':'reduce'} runway by ${(cash/burn-runway).toFixed(1)} months.`);
+  const endpoint=(monthly:number)=>({x:20+440*Math.min(1,cash/(monthly*12)),y:25+140*Math.min(1,monthly*12/cash)});
+  const base=endpoint(burn),plan=endpoint(total);
+  visual.querySelector('[data-scenario-path="base"]')?.setAttribute('d',`M20 25L${base.x} ${base.y}`);
+  visual.querySelector('[data-scenario-path="plan"]')?.setAttribute('d',`M20 25L${plan.x} ${plan.y}`);
+  visual.querySelector('[data-scenario-point="plan"]')?.setAttribute('cx',String(plan.x));
+  visual.querySelector('[data-scenario-point="plan"]')?.setAttribute('cy',String(plan.y));
+  refreshStorySummary();
+}
+const story=document.querySelector<HTMLElement>('.working-story');
+const storyVisual=document.querySelector<HTMLElement>('.story-visual');
+if(story&&storyVisual){
+  const stack=storyVisual.querySelector<HTMLElement>('.scenario-stack');
+  const panes=Array.from(storyVisual.querySelectorAll<HTMLElement>('[data-sheet]'));
+  const viewButtons=Array.from(storyVisual.querySelectorAll<HTMLButtonElement>('[data-story-view]'));
+  const scopeChapter=story.querySelector<HTMLElement>('.scope-section');
+  const engagementChapter=story.querySelector<HTMLElement>('.engagement-section');
+  const chooseView=(view:string)=>{
+    if(stack)stack.dataset.view=view;
+    panes.forEach(pane=>{const active=pane.dataset.sheet===view;pane.classList.toggle('is-active',active);pane.setAttribute('aria-hidden',String(!active));});
+    viewButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.storyView===view)));
+    refreshStorySummary();
   };
-  const scheduleEditorial=()=>{if(!pending){pending=true;requestAnimationFrame(updateEditorial);}};
-  window.addEventListener('scroll',scheduleEditorial,{passive:true});
-  window.addEventListener('resize',scheduleEditorial,{passive:true});
-  window.addEventListener('pageshow',scheduleEditorial);
-  reducedMotion.addEventListener('change',scheduleEditorial);
-  document.fonts.ready.then(scheduleEditorial);
-  scheduleEditorial();
+  viewButtons.forEach(button=>button.addEventListener('click',()=>chooseView(button.dataset.storyView||'sources')));
+  let lastChapter='',scheduled=false;
+  const updateStory=()=>{
+    scheduled=false;
+    if(reducedMotion.matches)return;
+    const rest=window.innerHeight*.53;
+    const view=(engagementChapter?.getBoundingClientRect().top??Infinity)<rest?'brief':(scopeChapter?.getBoundingClientRect().top??Infinity)<rest?'model':'sources';
+    if(view!==lastChapter){lastChapter=view;chooseView(view);}
+  };
+  const scheduleStory=()=>{if(!scheduled){scheduled=true;requestAnimationFrame(updateStory);}};
+  window.addEventListener('scroll',scheduleStory,{passive:true});window.addEventListener('resize',scheduleStory,{passive:true});window.addEventListener('pageshow',scheduleStory);reducedMotion.addEventListener('change',scheduleStory);document.fonts.ready.then(scheduleStory);scheduleStory();
 }
