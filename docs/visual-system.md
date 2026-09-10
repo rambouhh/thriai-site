@@ -32,14 +32,18 @@ does not define the service or establish a client result.
   interpolated. Editing inputs or choosing Show hiring result resolves the
   answer immediately; forward navigation preserves it and deliberate reverse
   scrolling replays the sequence. Mobile gives the fully connected forecast
-  a stable middle beat before the brief, within a700px sticky interval so the
+  a stable middle beat before the brief, within a 700px sticky interval so the
   operation is visible while the sheet is in view; reduced motion shows the
   stable resolved sheet. Reverse scrolling must restore placement and reveal.
 - The same working sheet remains mounted and visible as the benefit copy enters.
-  Desktop keeps it beside the copy; mobile compacts the same record, graph and
-  essential values into a178px dock above the benefits. It slides out after
-  the first benefit so later copy can use the full viewport; reverse scrolling
-  restores the same dock and sheet. The duplicate cash landscape is removed.
+  Desktop releases it beside the first benefit, then the last two articles
+  share a full-width row. Mobile compacts the same record, graph and essential
+  values while contracting its actual flow height. A bounded working stage
+  releases the sheet naturally before the benefit heading reaches it, with
+  no vacant fixed-height slot or translated overlay. Carry uses stable stage
+  travel from 620 to 800px, independent of the moving benefit geometry.
+  Reverse scrolling restores the same dock and sheet. The duplicate cash
+  landscape is removed.
   Reduced motion shows the complete sheet in normal flow before the benefits.
 - The main model and later decision brief share the same assumptions.
   Charts stop at zero; the month-12 numeric result may be negative. Text explains
@@ -54,7 +58,8 @@ the independent canvas fallback. Three.js was removed with the former renderer.
 The working record and sheet share upper-left illumination, a blue-black face
 and restrained copper/blue bevels. A projected shadow follows the existing
 docking state, softening at altitude and tightening at contact beneath the text.
-The final pale reading surface retains the same dark structural perimeter.
+The final pale reading surface retains a thin material rim, a copper spine
+and one directional shadow instead of multiple offset frame edges.
 
 ## Proof boundaries
 

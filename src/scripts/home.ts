@@ -337,12 +337,13 @@ import('./finance-scene').then(({startFinanceScene})=>{try{startFinanceScene();}
 const workingScene=document.querySelector<HTMLElement>('.demo-result');
 const workingWorkspace=document.querySelector<HTMLElement>('.demo-workspace');
 const workingJourney=document.querySelector<HTMLElement>('.working-journey');
+const workingStage=document.querySelector<HTMLElement>('.working-stage');
 const workingBenefits=document.querySelector<HTMLElement>('[data-working-benefits]');
 let workingFrame=0,workingOverride=false;
 const paintWorkingSequence=()=>{
   workingFrame=0;if(!workingScene||!workingWorkspace)return;
   const mobile=innerWidth<768;
-  const bounds=(mobile?(workingJourney||workingScene):workingWorkspace).getBoundingClientRect();
+  const bounds=(mobile?(workingStage||workingScene):workingWorkspace).getBoundingClientRect();
   const clamp=(n:number)=>Math.max(0,Math.min(1,n));
   const smooth=(n:number)=>{const t=clamp(n);return t*t*(3-2*t);};
   const progress=reducedMotion.matches||workingOverride?1:mobile?clamp((12-bounds.top)/700):clamp((70-bounds.top)/Math.max(300,(workingWorkspace.querySelector<HTMLElement>('.demo-controls')?.offsetHeight||1146)-workingScene.offsetHeight));
@@ -352,16 +353,13 @@ const paintWorkingSequence=()=>{
   workingScene.style.setProperty('--dock',String(dock));workingScene.style.setProperty('--resolve',String(resolve));
   workingJourney?.style.setProperty('--journey-dock',String(dock));
   const benefitsTop=workingBenefits?.getBoundingClientRect().top??innerHeight;
-  const carry=reducedMotion.matches?0:smooth((innerHeight*.82-benefitsTop)/(innerHeight*.3));
+  const carry=reducedMotion.matches?0:mobile?smooth((12-bounds.top-620)/180):smooth((innerHeight*.82-benefitsTop)/(innerHeight*.3));
   workingScene.style.setProperty('--carry',String(carry));
   workingScene.style.setProperty('--carry-place',String(smooth(carry/.5)));
   workingScene.style.setProperty('--carry-lift',String(smooth((carry-.8)/.2)));
   workingScene.dataset.workingCarry=carry.toFixed(3);
   workingScene.dataset.workingView=carry>.35?'carried':'full';
-  const firstBenefit=workingBenefits?.querySelector('article');
-  const release=mobile&&!reducedMotion.matches?Math.min(0,(firstBenefit?.getBoundingClientRect().bottom??innerHeight)-360):0;
-  workingScene.style.setProperty('--carry-release',`${release}px`);
-  workingScene.dataset.workingRelease=String(Math.round(release));
+  workingScene.style.setProperty('--carry-release','0px');
   const workingChart=workingScene.querySelector<SVGElement>('.cash-chart');
   workingScene.style.setProperty('--graph-height',`${(workingChart?.clientWidth||276)/3}px`);
   workingChart?.setAttribute('preserveAspectRatio',mobile&&carry>0?'none':'xMidYMid meet');
@@ -390,6 +388,20 @@ const paintWorkingSequence=()=>{
   if(endpoint){endpoint.style.transform=`translate(${(20-endpointX)*(1-forecast)}px,${(24-endpointY)*(1-forecast)}px)`;endpoint.style.visibility=forecast>0?'visible':'hidden';}
   workingScene.dataset.workingPhase=progress<dockEnd?'record':progress<briefStart?'model':'decision';
   workingScene.dataset.workingProgress=progress.toFixed(3);
+  if(mobile){
+    // Reserve exactly the rendered object's extent. This contracts both the
+    // stage and following content, without measuring that moving content.
+    const sheet=workingScene.querySelector<HTMLElement>('.working-sheet');
+    const token=workingScene.querySelector<HTMLElement>('.working-record');
+    const occupied=Math.max((sheet?.offsetTop||0)+(sheet?.offsetHeight||0),(token?.offsetTop||0)+(token?.offsetHeight||0));
+    workingScene.style.height=`${Math.ceil(occupied)+8}px`;
+    workingStage?.style.removeProperty('height');
+  }else{
+    workingScene.style.removeProperty('height');
+    const first=workingBenefits?.querySelector('article');
+    if(first&&workingStage)workingStage.style.height=`${Math.max(760,first.getBoundingClientRect().bottom-workingWorkspace.getBoundingClientRect().top)}px`;
+  }
+  workingScene.dataset.workingRelease=String(Math.round(Math.min(0,workingScene.getBoundingClientRect().top-(mobile?12:70))));
 };
 const scheduleWorkingSequence=()=>{if(!workingFrame)workingFrame=requestAnimationFrame(paintWorkingSequence);};
 const showWorkingResult=()=>{workingOverride=true;paintWorkingSequence();};
