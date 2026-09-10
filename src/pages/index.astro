@@ -9,12 +9,12 @@ const comparisons = [
 ---
 <Layout title="Thriai — Don't hire a consultant. Hire a builder.">
   <div class="opening" id="opening">
-    <div class="system-stage" aria-hidden="true">
+    <div class="system-track" aria-hidden="true"><div class="system-stage">
       <div class="system-atmosphere"></div>
       <div class="system-fallback"><i></i><i></i><i></i></div>
       <canvas id="system-canvas"></canvas>
       <div class="scene-index"><span class="scene-dot"></span> <span id="scene-label">01 / CONNECT THE INFORMATION</span></div>
-    </div>
+    </div></div>
     <section class="builder-hero wrap" aria-labelledby="hero-heading">
       <p class="eyebrow">Senior finance expertise.<br class="mobile-only" /> Hands-on AI implementation.</p>
       <h1 id="hero-heading"><span>Don't hire</span><span>a consultant.</span><span class="builder-line">Hire a builder<span class="orange-period">.</span></span></h1>
@@ -48,11 +48,11 @@ const comparisons = [
         <div class="demo-workspace">
           <form class="demo-inputs" id="scenario-form" aria-label="Illustrative hiring scenario">
             <div class="demo-step">01 / THE INPUTS</div>
-            <label for="cash">Cash today <span>USD</span><div class="input-shell"><b>$</b><input id="cash" name="cash" type="number" min="10000" max="100000000" step="10000" value="1200000" required /></div></label>
-            <label for="burn">Monthly net cash burn <span>BEFORE HIRES</span><div class="input-shell"><b>$</b><input id="burn" name="burn" type="number" min="1000" max="10000000" step="1000" value="75000" required /></div></label>
+            <label for="cash">Cash today <span>USD</span><div class="input-shell"><b>$</b><input id="cash" name="cash" type="number" min="1" max="100000000" step="1" value="1200000" aria-describedby="demo-error" required /></div></label>
+            <label for="burn">Monthly net cash burn <span>BEFORE HIRES</span><div class="input-shell"><b>$</b><input id="burn" name="burn" type="number" min="1" max="10000000" step="1" value="75000" aria-describedby="demo-error" required /></div></label>
             <label for="hires">Planned hires <output for="hires" id="hire-count">2 people</output><input id="hires" name="hires" type="range" min="0" max="6" step="1" value="2" /></label>
-            <label for="hire-cost">Monthly cost per hire <span>FULLY LOADED</span><div class="input-shell"><b>$</b><input id="hire-cost" name="hireCost" type="number" min="1000" max="100000" step="500" value="10000" required /></div></label>
-            <p class="demo-error" id="demo-error" hidden>Enter positive amounts within the stated input limits to update this scenario.</p>
+            <label for="hire-cost">Monthly cost per hire <span>FULLY LOADED</span><div class="input-shell"><b>$</b><input id="hire-cost" name="hireCost" type="number" min="1" max="100000" step="1" value="10000" aria-describedby="demo-error" required /></div></label>
+            <p class="demo-error" id="demo-error" role="alert" hidden></p>
           </form>
           <div class="demo-result" aria-live="polite" aria-atomic="true">
             <div class="demo-step">02 / CONNECT THE MODEL</div>

@@ -45,29 +45,65 @@ if (canvas && opening) {
       ];
       layers.forEach((layer,li) => {
         const drift = (1-bluePhase) * (li-1) * 38;
-        // Dense, precisely spaced contours make the translucent finance planes.
-        for(let rail=0;rail<21;rail++) {
-          const inset=rail*5.1;
+        const contour=(inset=0,depth=0)=>{
           const pts=[];
-          for(let step=0;step<=96;step++) {
-            const t=step/96*Math.PI*2;
+          for(let step=0;step<=128;step++) {
+            const t=step/128*Math.PI*2;
             const x=Math.sign(Math.cos(t))*Math.pow(Math.abs(Math.cos(t)),.32)*(layer.size-inset);
             const z=Math.sign(Math.sin(t))*Math.pow(Math.abs(Math.sin(t)),.32)*(layer.size-inset);
-            pts.push(project(x+drift,layer.y+Math.sin(t*2+p*2)*9*(1-bluePhase),z));
+            pts.push(project(x+drift,layer.y+depth+Math.sin(t*2+p*2)*9*(1-bluePhase),z));
           }
-          path(pts);
-          ctx.strokeStyle=`rgba(${li===2 && rail<5 ? layer.color : '54,110,255'},${rail===0?.85:.13 + (1-rail/21)*.22})`;
-          ctx.lineWidth=rail===0?1.65:.6;
-          ctx.shadowColor=li===2?'#ff8a44':'#316aff';ctx.shadowBlur=rail===0?22:0;ctx.stroke();
-          if(rail===0){ctx.lineWidth=7;ctx.strokeStyle=`rgba(${layer.color},.06)`;ctx.shadowBlur=33;ctx.stroke();}
+          return pts;
+        };
+        const outer=contour(),under=contour(0,14),inner=contour(29);
+        const xs=outer.map(v=>v.x),ys=outer.map(v=>v.y);
+        const left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bottom=Math.max(...ys);
+        // Physical thickness and contact shadow separate the planes. Surfaces
+        // paint back-to-front; upper material occludes the lower structure.
+        path(under);ctx.closePath();ctx.fillStyle='#061024';ctx.shadowColor='#000';ctx.shadowBlur=38;ctx.shadowOffsetY=18;ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+        const side=ctx.createLinearGradient(left,top,right,bottom);
+        side.addColorStop(0,'#081629');side.addColorStop(.45,'#123579');side.addColorStop(.73,'#1d54c5');side.addColorStop(1,'#080e1b');
+        for(let j=0;j<128;j++){
+          if((outer[j].y+outer[j+1].y)/2<centerY+layer.y*scale*.35)continue;
+          path([outer[j],outer[j+1],under[j+1],under[j]]);ctx.closePath();ctx.fillStyle=side;ctx.fill();
         }
-        ctx.shadowBlur=0;
-        // Underlying records enter the same system through parallel rails.
-        for(let j=0;j<8;j++) {
-          const z=-180+j*48;
+        path(outer);ctx.closePath();ctx.fillStyle=li===2?'rgba(5,9,18,.97)':'rgba(6,14,32,.96)';ctx.fill();
+        // A broad blue reflection crosses smoked material. It has a dark core
+        // and concentrated rim, rather than uniform wireframe illumination.
+        ctx.save();path(outer);ctx.closePath();ctx.clip();
+        const reflection=ctx.createLinearGradient(left,bottom,right,top);
+        reflection.addColorStop(0,'rgba(87,157,255,.86)');
+        reflection.addColorStop(.09,'rgba(36,93,249,.74)');
+        reflection.addColorStop(.23,'rgba(22,49,143,.45)');
+        reflection.addColorStop(.46,'rgba(6,14,36,.03)');
+        reflection.addColorStop(.78,'rgba(5,9,18,0)');
+        reflection.addColorStop(1,li===2?'rgba(219,94,31,.29)':'rgba(25,62,140,.14)');
+        ctx.fillStyle=reflection;ctx.fillRect(left,top,right-left,bottom-top);
+        const pool=ctx.createRadialGradient(left+(right-left)*.23,bottom-22,0,left+(right-left)*.23,bottom-22,(right-left)*.53);
+        pool.addColorStop(0,'rgba(65,127,255,.48)');pool.addColorStop(.36,'rgba(25,67,199,.18)');pool.addColorStop(1,'rgba(9,17,34,0)');ctx.fillStyle=pool;ctx.fillRect(left,top,right-left,bottom-top);
+        ctx.restore();
+        // Recessed center leaves one clear quiet mass; just three etched
+        // contours retain the connection to modeled records and data planes.
+        path(inner);ctx.closePath();ctx.fillStyle='rgba(5,10,23,.31)';ctx.fill();
+        for(const inset of [10,20,31]){
+          path(contour(inset));ctx.strokeStyle=`rgba(111,158,248,${inset===31?.13:.07})`;ctx.lineWidth=.65;ctx.stroke();
+        }
+        const rim=ctx.createLinearGradient(left,top,right,bottom);
+        rim.addColorStop(0,li===2?'#ffbe86':'#4c83ed');rim.addColorStop(.19,li===2?'#ed8844':'#2b65ea');rim.addColorStop(.36,'#122e63');rim.addColorStop(.52,'#153ba5');rim.addColorStop(.74,'#428aff');rim.addColorStop(.86,'#a6d4ff');rim.addColorStop(1,'#2a60ce');
+        // Bloom follows only the true outer edge. The bright core has a narrow
+        // highlight while broad spill makes neighboring darkness feel deep.
+        for(const pass of [{width:19,alpha:.09,blur:27},{width:6,alpha:.2,blur:16},{width:1.8,alpha:.96,blur:5}]){
+          path(outer);ctx.strokeStyle=rim;ctx.lineWidth=pass.width;ctx.globalAlpha=pass.alpha;ctx.shadowColor=li===2?'#db7538':'#285fff';ctx.shadowBlur=pass.blur;ctx.stroke();
+        }
+        ctx.globalAlpha=1;ctx.shadowBlur=0;
+        // One fine specular sliver makes the rounded edge read as material.
+        const glint=outer.slice(72,101);path(glint);ctx.lineWidth=.9;ctx.strokeStyle='rgba(184,220,255,.76)';ctx.stroke();
+        // Records enter through a small number of purposeful connections.
+        for(let j=0;j<4;j++) {
+          const z=-160+j*85;
           const start=project(-780,layer.y,z),join=project(-layer.size+95,layer.y,z),end=project(-80,layer.y,z);
           const grad=ctx.createLinearGradient(start.x,start.y,end.x,end.y);
-          grad.addColorStop(0,'rgba(31,83,206,0)');grad.addColorStop(.68,`rgba(69,115,255,${.1+bluePhase*.13})`);grad.addColorStop(1,'rgba(89,135,255,0)');
+          grad.addColorStop(0,'rgba(31,83,206,0)');grad.addColorStop(.68,`rgba(69,115,255,${.055+bluePhase*.08})`);grad.addColorStop(1,'rgba(89,135,255,0)');
           ctx.beginPath();ctx.moveTo(start.x,start.y);ctx.bezierCurveTo(join.x-90,join.y+30,join.x,join.y,end.x,end.y);ctx.strokeStyle=grad;ctx.lineWidth=.65;ctx.stroke();
         }
       });
@@ -80,7 +116,14 @@ if (canvas && opening) {
       path(thread);ctx.strokeStyle='rgba(255,164,100,.8)';ctx.lineWidth=1.4;ctx.shadowColor='#ff8a44';ctx.shadowBlur=17;ctx.stroke();ctx.shadowBlur=0;
       [0,.45,1].forEach((t,i)=>{
         const at=thread[Math.round(t*70)];ctx.fillStyle=i===2?'#ffc390':'#8eb5ff';ctx.fillRect(at.x-2,at.y-2,4,4);
-        if(!mobile){ctx.font='9px monospace';ctx.letterSpacing='1px';ctx.fillStyle=i===2?'#e9ad89':'#90a8cc';ctx.fillText(['RECORDS','MODELS','DECISIONS'][i],at.x+14,at.y+4);}
+        if(!mobile){
+          const name=['RECORDS','MODELS','DECISIONS'][i];
+          ctx.font='12px monospace';ctx.letterSpacing='1px';
+          const textWidth=ctx.measureText(name).width;
+          const tx=clamp(at.x+14,Math.max(28,width*.52),width-textWidth-28),ty=clamp(at.y+4,125,height-75);
+          if(Math.abs(tx-at.x)>28||Math.abs(ty-at.y)>20){ctx.beginPath();ctx.moveTo(at.x,at.y);ctx.lineTo(tx-8,ty-4);ctx.strokeStyle='rgba(143,173,217,.24)';ctx.lineWidth=.6;ctx.stroke();}
+          ctx.fillStyle=i===2?'#efbd99':'#a4b8d8';ctx.fillText(name,tx,ty);
+        }
       });
       // A single pulse along the connection, never a decorative particle field.
       if(!reducedMotion.matches){const node=thread[Math.floor((time/4800)%1*70)];ctx.beginPath();ctx.arc(node.x,node.y,2.5,0,Math.PI*2);ctx.fillStyle='#fff1d8';ctx.shadowColor='#ff985c';ctx.shadowBlur=18;ctx.fill();ctx.shadowBlur=0;}
@@ -107,12 +150,24 @@ if(form){
   const setText = (id:string,value:string) => {const el=document.getElementById(id);if(el)el.textContent=value;};
   const update = () => {
     const error=document.getElementById('demo-error');
-    if(!form.checkValidity()){if(error)error.hidden=false;return;}
+    const result=document.querySelector<HTMLElement>('.demo-result');
+    const fields=Array.from(form.querySelectorAll<HTMLInputElement>('input'));
+    fields.forEach(input=>input.setAttribute('aria-invalid',String(!input.validity.valid)));
+    const invalid=fields.find(input=>!input.validity.valid);
+    if(invalid){
+      const names:Record<string,string>={cash:'Cash today',burn:'Monthly net cash burn','hire-cost':'Monthly cost per hire',hires:'Planned hires'};
+      const issue=invalid.validity.valueMissing || invalid.validity.badInput ? 'enter a whole-dollar amount' : invalid.validity.stepMismatch ? 'use whole dollars' : `enter an amount from ${currency(Number(invalid.min))} to ${currency(Number(invalid.max))}`;
+      if(error){error.textContent=`${names[invalid.id]}: ${issue}. Results will update when all inputs are valid.`;error.hidden=false;}
+      if(result)result.dataset.state='invalid';
+      setText('runway','—');setText('decision-answer','Complete the highlighted input to calculate this scenario.');setText('formula','The scenario is incomplete. No current result is available.');setText('chart-title','No current chart: complete all scenario inputs to calculate.');
+      return;
+    }
     if(error)error.hidden=true;
+    if(result)result.dataset.state='valid';
     const value=(id:string)=>Number((document.getElementById(id) as HTMLInputElement).value);
     const cash=value('cash'),burn=value('burn'),hires=value('hires'),cost=value('hire-cost');
     const additional=hires*cost,total=burn+additional,runway=cash/total,baseline=cash/burn,remaining=cash-total*12;
-    const niceRunway = runway>=1000 ? runway.toLocaleString('en-US',{maximumFractionDigits:0}) : runway.toFixed(1);
+    const niceRunway = runway>=1000 ? new Intl.NumberFormat('en-US',{notation:'compact',maximumFractionDigits:1}).format(runway) : runway.toFixed(1);
     setText('hire-count',`${hires} ${hires===1?'person':'people'}`);setText('runway',niceRunway);
     const impact=hires===0 ? 'With no additional hires, the scenario keeps the current burn rate.' : `${hires} ${hires===1?'hire adds':'hires add'} ${currency(additional)} to monthly burn and ${hires===1?'reduces':'reduce'} runway by ${(baseline-runway).toFixed(1)} months.`;
     const outcome=remaining>=0 ? `At month 12, the model leaves ${currency(remaining)} in cash.` : `Cash reaches zero after ${runway.toFixed(1)} months, before the 12-month horizon.`;

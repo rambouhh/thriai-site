@@ -19,3 +19,21 @@
 .hero-bottom>p,.reach-copy p,.proof-intro p,.demo-heading>p,.benefit-rows p,.scope-heading>p,.practice-list p,.engagement-grid>div>p,.closing-bottom p,.interior-page .lead,.interior-page .card p,.interior-page .card ul,.interior-page table,.interior-page .faq p{font-size:16px}
 .hero-bottom{max-width:550px}.hero-bottom>p{max-width:470px}.hero-actions{flex-wrap:wrap}.demo-heading>p{max-width:330px}.demo-inputs label>span,.demo-inputs label>output{float:none;display:block;margin-top:5px}.demo-inputs .demo-step{line-height:1.6}.demo-assumptions>div{line-height:1.7}.demo-assumptions summary{gap:20px}.comparison-note{line-height:1.6}.footer-bottom{line-height:1.6}.interior-page th{font-size:12px}.interior-page .card .price small{font-size:14px}.interior-page .faq summary{font-size:16px}.cash-chart text{font-size:12px}
 @media(max-width:767px){.builder-hero{min-height:1030px}.hero-bottom{margin-top:230px}.hero-actions{gap:8px 20px}.hero-actions .text-link{padding:15px 0}.hero-footnote{margin-top:30px}.scene-index{display:none}.comparison-row>span{font-size:16px;padding-right:16px}.comparison-row>span:nth-child(2){padding-left:16px}.comparison-head>span{font-size:12px!important}.demo-inputs{grid-template-columns:1fr}.demo-inputs label>span,.demo-inputs label>output{float:right;display:inline;font-size:12px;margin-top:1px}.demo-inputs label[for=hires]{order:0}.demo-inputs .demo-step{grid-column:auto}.input-shell input{font-size:24px}.demo-badge{font-size:11px}.runway-number{gap:20px}.runway-number>span{font-size:12px!important}.demo-heading h3{font-size:37px}.footer-top{grid-template-columns:1fr}.footer-top p{margin-bottom:10px}.footer-links{grid-column:auto}.interior-page table{table-layout:auto;display:block;overflow-x:auto}.interior-page th,.interior-page td{min-width:140px;padding-right:18px}.interior-page th:nth-child(2),.interior-page td:nth-child(2){min-width:240px}.interior-page .wrap:has(table){overflow:hidden}.benefit-rows article{grid-template-columns:25px 1fr}.demo-heading>p{font-size:16px}.practice-list h3{font-size:27px}.practice-list p{font-size:16px}}
+
+/* Round 02: the scene is physically bounded by the opening, without negative flow margins. */
+.opening{position:relative;isolation:isolate;overflow:clip;z-index:0}
+.system-track{position:absolute;inset:0;z-index:0;pointer-events:none}
+.system-track .system-stage{position:sticky;top:0;height:100svh;min-height:0;margin:0;z-index:0}
+.opening>.builder-hero,.opening>.delivery-section,.opening>.reach-section{position:relative;z-index:1}
+.opening>.light-transition{position:relative;z-index:2;background:linear-gradient(180deg,transparent 0%,#2765ff80 19%,#8abafaeb 58%,#d5e8f8 82%,#f4f5f3 100%)}
+.light-world{position:relative;z-index:1;isolation:isolate}
+.closing-section,.site-footer{position:relative;z-index:1}
+.demo-result[data-state=invalid] .cash-chart,.demo-result[data-state=invalid] .chart-legend{visibility:hidden}
+.demo-result[data-state=invalid] .runway-number strong{color:#a0a7b2}
+.demo-result[data-state=invalid] .demo-answer{border-top-color:#cc7c66}
+.demo-inputs input[aria-invalid=true]{outline:2px solid #b82916;outline-offset:2px}
+.demo-error{font-size:14px;line-height:1.6}
+.light-world .proof-intro p:not(.large-copy):not(.proof-disclosure),.light-world .benefit-rows p,.light-world .scope-heading>p,.light-world .engagement-grid>div>p{font-family:Arial,Helvetica,sans-serif;font-weight:400;color:#414d5d;line-height:1.75}
+.proof-intro .proof-disclosure{max-width:360px;padding-top:18px;border-top:1px solid #c4ccd5;color:#4e5b6d}
+@media(max-width:767px){.reach-section{min-height:0;padding-bottom:90px}.reach-copy{margin-top:54px;margin-left:0;max-width:460px;padding:22px 20px;background:linear-gradient(105deg,#080f20ed,#101b32e0);border-left:2px solid #6897ff}.reach-copy p{color:#e2ebfa}.reach-copy .reach-statement{margin-top:24px}.proof-intro>div{margin-left:0}.demo-badge{font-size:12px}.demo-assumptions>div{font-size:14px}.cash-chart text{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.system-track .system-stage{position:absolute;inset:0;min-height:900px}.opening>.light-transition{background:linear-gradient(#173ab0,#86b8ff,#f4f5f3)}}
