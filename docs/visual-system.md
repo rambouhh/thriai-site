@@ -35,7 +35,11 @@ does not define the service or establish a client result.
   a stable middle beat before the brief, within a700px sticky interval so the
   operation is visible while the sheet is in view; reduced motion shows the
   stable resolved sheet. Reverse scrolling must restore placement and reveal.
-- The main model, later cash chart and decision brief share the same assumptions.
+- The same working sheet remains mounted and visible as the benefit copy enters.
+  Desktop keeps it beside the copy; mobile compacts the same record, graph and
+  essential values above the benefits. The duplicate cash landscape is removed.
+  Reduced motion shows the complete sheet in normal flow before the benefits.
+- The main model and later decision brief share the same assumptions.
   Charts stop at zero; the month-12 numeric result may be negative. Text explains
   that the example is simple arithmetic, not an AI recommendation.
 

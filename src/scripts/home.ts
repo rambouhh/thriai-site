@@ -337,6 +337,7 @@ import('./finance-scene').then(({startFinanceScene})=>{try{startFinanceScene();}
 const workingScene=document.querySelector<HTMLElement>('.demo-result');
 const workingWorkspace=document.querySelector<HTMLElement>('.demo-workspace');
 const workingJourney=document.querySelector<HTMLElement>('.working-journey');
+const workingBenefits=document.querySelector<HTMLElement>('[data-working-benefits]');
 let workingFrame=0,workingOverride=false;
 const paintWorkingSequence=()=>{
   workingFrame=0;if(!workingScene||!workingWorkspace)return;
@@ -344,7 +345,12 @@ const paintWorkingSequence=()=>{
   const bounds=(mobile?(workingJourney||workingScene):workingWorkspace).getBoundingClientRect();
   const clamp=(n:number)=>Math.max(0,Math.min(1,n));
   const smooth=(n:number)=>{const t=clamp(n);return t*t*(3-2*t);};
-  const progress=reducedMotion.matches||workingOverride?1:mobile?clamp((12-bounds.top)/Math.max(240,(workingJourney?.offsetHeight||1060)-workingScene.offsetHeight)):clamp((70-bounds.top)/Math.max(300,workingWorkspace.offsetHeight-workingScene.offsetHeight));
+  const progress=reducedMotion.matches||workingOverride?1:mobile?clamp((12-bounds.top)/700):clamp((70-bounds.top)/Math.max(300,(workingWorkspace.querySelector<HTMLElement>('.demo-controls')?.offsetHeight||1146)-workingScene.offsetHeight));
+  const benefitsTop=workingBenefits?.getBoundingClientRect().top??innerHeight;
+  const carry=reducedMotion.matches?0:smooth((innerHeight*.82-benefitsTop)/(innerHeight*.3));
+  workingScene.style.setProperty('--carry',String(carry));
+  workingScene.dataset.workingCarry=carry.toFixed(3);
+  workingScene.dataset.workingView=carry>.35?'carried':'full';
   const dockEnd=mobile?.3:.55,forecastEnd=mobile?.5:.8,briefStart=mobile?.85:.8;
   const dock=smooth(progress/dockEnd),resolve=smooth((progress-briefStart)/(1-briefStart));
   const applied=progress>=(mobile?forecastEnd:dockEnd),brief=progress>=briefStart,valid=workingScene.dataset.state!=='invalid';

@@ -65,6 +65,7 @@ const artifactMarkup = `<div class="material-object" aria-hidden="true">
             <label for="hire-cost">Monthly cost per hire <span>FULLY LOADED</span><div class="input-shell"><b>$</b><input id="hire-cost" name="hireCost" type="number" min="1" max="100000" step="1" value="10000" aria-describedby="demo-error" required /></div></label>
             <p class="demo-error" id="demo-error" role="alert" hidden></p>
           </form>
+        <details class="demo-assumptions"><summary>See the arithmetic and assumptions <span aria-hidden="true">+</span></summary><div><p id="formula">$1,200,000 ÷ ($75,000 + 2 × $10,000) = 12.6 months.</p><p>Synthetic inputs, not client data or a client result. Hires start immediately. Burn and employee costs stay constant; no revenue growth, financing, severance, hiring fees or interest. The chart covers 12 months and stops at zero. A real decision also needs timing, revenue scenarios and an agreed minimum cash buffer. This is an arithmetic demonstration, not an AI-generated recommendation.</p></div></details>
           <div class="demo-process-note" data-demo-beat="model"><span>02 / THE CONNECTION</span><h4>The hiring record joins the cash model.</h4><p>The added monthly cost flows into the same cash forecast. The solid line shows the change; the dashed line keeps the original plan in view.</p></div>
           <div class="demo-process-note" data-demo-beat="decision"><span>03 / THE DECISION</span><h4>Carry the tradeoff forward.</h4><p>The same record and graph become a brief. Senior judgment still needs to weigh start dates, revenue scenarios and the cash buffer.</p></div></div>
           <div class="working-journey"><div class="demo-result" aria-live="polite" aria-atomic="true">
@@ -75,29 +76,19 @@ const artifactMarkup = `<div class="material-object" aria-hidden="true">
             <div class="chart-legend"><span><i class="legend-base"></i> Before hires</span><span><i class="legend-hire"></i> With hires</span></div>
             <div class="working-cash"><span>Cash at month 12</span><strong data-baseline-value="remaining" hidden>$300,000</strong><strong data-working-value="remaining">$60,000</strong></div>
             <div class="demo-answer"><div class="demo-step" data-answer-context>THE TRADEOFF / SYNTHETIC SCENARIO</div><p data-working-explanation hidden>Current burn only. H–01 has not yet been applied to this forecast.</p><p id="decision-answer">Two hires add $20,000 to monthly burn and reduce runway by 3.4 months. At month 12, the model leaves $60,000 in cash.</p><button class="working-skip" type="button" data-working-skip>Show hiring result <span aria-hidden="true">↗</span></button></div><div class="working-progress" aria-hidden="true"><span>01 RECORD</span><i></i><span>02 MODEL</span><i></i><span>03 BRIEF</span></div></div>
-          </div></div>
+          </div><div class="working-action-distance" aria-hidden="true"></div>
+    <section class="benefits-scene" data-working-benefits aria-labelledby="benefits-heading" data-finance-scene="benefits">
+      <div class="section-number">04 / WHAT IT MAKES POSSIBLE</div>
+      <h2 id="benefits-heading">Build the foundation once. <span>Keep expanding</span> what it can do.</h2>
+      <div class="benefit-triptych"><article><span>01 / THE BUDGET</span><h3>Preserve<br />runway.</h3><p>Automate recurring work, consolidate overlapping tools and reduce dependence on disconnected service providers. Put more of your budget toward building the business.</p></article><article><span>02 / THE DECISION</span><h3>Get answers while<br />decisions are still open.</h3><p>Bring financial and operating information together. Explore performance, cash and hiring with AI grounded in your company’s data, supported by an experienced finance operator.</p></article><article><span>03 / THE NEXT STAGE</span><h3>Be ready when the<br />questions get harder.</h3><p>Give your board, investors and external reviewers consistent reporting and a clear path to the underlying records. Carry that foundation into fundraising, diligence and your next stage.</p></article></div>
+    </section>
+          </div>
         </div>
-        <details class="demo-assumptions"><summary>See the arithmetic and assumptions <span aria-hidden="true">+</span></summary><div><p id="formula">$1,200,000 ÷ ($75,000 + 2 × $10,000) = 12.6 months.</p><p>Synthetic inputs, not client data or a client result. Hires start immediately. Burn and employee costs stay constant; no revenue growth, financing, severance, hiring fees or interest. The chart covers 12 months and stops at zero. A real decision also needs timing, revenue scenarios and an agreed minimum cash buffer. This is an arithmetic demonstration, not an AI-generated recommendation.</p></div></details>
+
       </div>
     </section>
 
     <div class="finance-story story-visual" id="working-story">
-    <section class="benefits-scene wrap" aria-labelledby="benefits-heading" data-finance-scene="benefits">
-      <div class="section-number">04 / WHAT IT MAKES POSSIBLE</div>
-      <h2 id="benefits-heading">Build the foundation once.<br /><span>Keep expanding</span><br />what it can do.</h2>
-      <div class="runway-landscape">
-        <div class="landscape-paper" aria-hidden="true"></div>
-        <figure class="cash-surface">
-          <figcaption><span class="scene-dot" aria-hidden="true"></span> THE SAME WORKING MODEL / SYNTHETIC INPUTS</figcaption>
-          <div class="surface-reading"><strong data-scenario="runway">12.6</strong><span>months of runway<br />with the planned hires</span></div>
-          <div class="horizon-display"><svg class="landscape-chart artifact-chart" viewBox="0 0 480 210" role="img" aria-label="Illustrative cash over 12 months: before and after planned hires"><defs><linearGradient id="landscape-glow" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#779fff" stop-opacity=".35"/><stop offset="1" stop-color="#366dff" stop-opacity="0"/></linearGradient></defs><path d="M20 25H460M20 95H460M20 165H460" stroke="#8baaf23d" fill="none"/><path data-scenario-path="area" d="M20 25L460 158L460 165H20Z" fill="url(#landscape-glow)"/><path data-scenario-path="base" d="M20 25L460 130" stroke="#90a9d2" stroke-width="1.5" stroke-dasharray="5 5" fill="none"/><path data-scenario-path="plan" d="M20 25L460 158" stroke="#b6d6ff" stroke-width="2.5" fill="none"/><circle data-scenario-point="plan" cx="460" cy="158" r="4" fill="#ffa871"/><text x="20" y="197">TODAY</text><text x="460" y="197" text-anchor="end">MONTH 12</text></svg></div>
-          <div class="surface-ledger"><div><span>Cash today</span><strong data-scenario="cash">$1,200,000</strong></div><div><span>Monthly burn with hires</span><strong data-scenario="total">$95,000</strong></div><div><span>Cash at month 12</span><strong data-scenario="remaining">$60,000</strong></div></div>
-          <div class="surface-foot"><span>Solid: with hires · Dashed: before hires</span><a href="#demo">Change the assumptions <b aria-hidden="true">↑</b></a></div>
-        </figure>
-        <span class="landscape-index" aria-hidden="true">RECORDS → MODEL → DECISION</span>
-      </div>
-      <div class="benefit-triptych"><article><span>01 / THE BUDGET</span><h3>Preserve<br />runway.</h3><p>Automate recurring work, consolidate overlapping tools and reduce dependence on disconnected service providers. Put more of your budget toward building the business.</p></article><article><span>02 / THE DECISION</span><h3>Get answers while<br />decisions are still open.</h3><p>Bring financial and operating information together. Explore performance, cash and hiring with AI grounded in your company’s data, supported by an experienced finance operator.</p></article><article><span>03 / THE NEXT STAGE</span><h3>Be ready when the<br />questions get harder.</h3><p>Give your board, investors and external reviewers consistent reporting and a clear path to the underlying records. Carry that foundation into fundraising, diligence and your next stage.</p></article></div>
-    </section>
     <section class="scope-scene" id="services" aria-labelledby="scope-heading" data-finance-scene="scope"><div class="wrap">
       <div class="section-number">05 / A CONNECTED FINANCE FUNCTION</div>
       <div class="scope-scene-heading"><h2 id="scope-heading">Each part makes<br />the others<br /><em>more useful.</em></h2><p>The information that runs your books should inform your forecast, support a board discussion and help answer an investor’s question. We bring bookkeeping, cash operations, planning, reporting and systems into one operating approach.</p></div>
