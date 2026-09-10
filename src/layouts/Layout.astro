@@ -38,9 +38,10 @@ const ld = { '@context':'https://schema.org', '@type':'ProfessionalService', nam
         </div>
       </nav>
     </header>
-    <main id="main"><slot /></main>
+    <main id="main">{!home && <div class="interior-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>}<slot /></main>
     <footer class="site-footer">
       <div class="wrap">
+        <div class="footer-signature" aria-hidden="true"><span>thriai<i>✳</i></span><div class="footer-system"><b>RECORDS</b><i></i><b>MODEL</b><i></i><b>DECISION</b></div></div>
         <div class="footer-top"><a class="logo" href="/">thri<span>ai</span><i aria-hidden="true">✳</i></a><p>Senior judgment.<br />Hands-on implementation.</p><div class="footer-links"><a href="/pricing">Pricing ↗</a><a href="/about">About ↗</a><a href="/contact">Contact ↗</a><a href="mailto:hello@thriai.io">hello@thriai.io ↗</a></div></div>
         <div class="footer-bottom"><p>© {new Date().getFullYear()} Thriai LLC · Sheridan, Wyoming</p><p>Finance advisory, FP&amp;A and systems services. We do not provide audit, review, attest or tax return preparation services.</p></div>
       </div>

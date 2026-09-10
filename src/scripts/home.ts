@@ -36,10 +36,10 @@ if (canvas && opening) {
       const labelAlpha = deliveryBounds ? smooth((deliveryBounds.top-height*.65)/(height*.35)) : 1;
       if(sceneIndex)sceneIndex.style.opacity=String(labelAlpha);
       const bluePhase = clamp((p - .35) / .5);
-      const scale = (mobile ? width * .00123 : Math.min(width * .00084,1.4)) * (1 + bluePhase * .28);
-      const centerX = width * (mobile ? .69 - bluePhase * .2 : .79 - bluePhase * .37);
+      const scale = (mobile ? width * .00105 : Math.min(width * .00067,1.16)) * (1 + bluePhase * .18);
+      const centerX = width * (mobile ? .60 - bluePhase * .1 : .76 - bluePhase * .40);
       const centerY = height * (mobile ? .49 + bluePhase * .12 : .49 + bluePhase * .08);
-      const spin = -.29 + p * .43;
+      const spin = -.36 + p * .59;
       const tilt = .86 - bluePhase * .18;
       ctx.clearRect(0,0,width,height);
       const atmosphere = ctx.createRadialGradient(centerX,centerY,0,centerX,centerY,Math.max(width,height)*.7);
@@ -54,14 +54,14 @@ if (canvas && opening) {
         return {x:centerX+rotX*scale*persp,y:centerY+ry*scale*persp,z:rz};
       };
       const path = (points:{x:number,y:number}[]) => {ctx.beginPath();points.forEach((v,i)=>i?ctx.lineTo(v.x,v.y):ctx.moveTo(v.x,v.y));};
-      const separation=130+Math.sin(p*Math.PI)*62;
+      const separation=195+Math.sin(p*Math.PI)*62;
       const layers = [
-        {y:separation,size:329,color:'65,111,255'},
-        {y:0,size:343-bluePhase*24,color:'98,151,255'},
-        {y:-separation,size:355-bluePhase*62,color:'255,151,91'},
+        {y:separation,size:270,offset:-210,color:'65,111,255'},
+        {y:0,size:265,offset:-60,color:'98,151,255'},
+        {y:-separation,size:245,offset:70,color:'255,151,91'},
       ];
       layers.forEach((layer,li) => {
-        const drift = (1-bluePhase) * (li-1) * 38;
+        const drift = layer.offset*(1-bluePhase*.22);
         const contour=(inset=0,depth=0)=>{
           const pts=[];
           for(let step=0;step<=128;step++) {
@@ -109,7 +109,8 @@ if (canvas && opening) {
         // All marks share its world coordinates and are clipped before the
         // next, nearer plane is drawn, so the geometry obeys true occlusion.
         ctx.save();path(inner);ctx.closePath();ctx.clip();
-        const surface=(x:number,z:number)=>project(x+drift,layer.y-1,z);
+        const structureScale=(layer.size-44)/240;
+        const surface=(x:number,z:number)=>project(x*structureScale+drift,layer.y-1,z*structureScale);
         const line=(points:[number,number][],color:string,lineWidth=1)=>{
           path(points.map(([x,z])=>surface(x,z)));ctx.strokeStyle=color;ctx.lineWidth=lineWidth;ctx.stroke();
         };
@@ -119,13 +120,13 @@ if (canvas && opening) {
         if(li===0){
           // RECORDS: regular entries and reconciliation rails. Equal units
           // describe structure, never a fabricated company data series.
-          const strength=.3+(1-smooth(p/.5))*.45;
-          for(let row=0;row<8;row++){
-            const z=-203+row*55;
-            tile(-228,z,7,7,`rgba(115,169,255,${strength})`);
-            tile(-191,z,176,2,`rgba(82,130,218,${strength*.45})`);
-            tile(24,z,66,2,`rgba(112,153,222,${strength*.65})`);
-            tile(139,z,53,2,`rgba(112,153,222,${strength*.65})`);
+          const strength=.72+(1-smooth(p/.5))*.22;
+          for(let row=0;row<6;row++){
+            const z=-184+row*72;
+            tile(-228,z-4,14,14,`rgba(162,199,255,${strength})`);
+            tile(-191,z,176,5,`rgba(110,166,255,${strength*.78})`);
+            tile(24,z,66,5,`rgba(160,196,255,${strength*.85})`);
+            tile(139,z,53,5,`rgba(160,196,255,${strength*.85})`);
           }
           line([[-204,-222],[-204,224]],'rgba(105,152,231,.16)');
           line([[114,-222],[114,224]],'rgba(105,152,231,.16)');
@@ -133,36 +134,36 @@ if (canvas && opening) {
         }else if(li===1){
           // MODEL: a governed dependency structure joins inputs to one spine.
           // Its paths brighten around the middle of the scroll argument.
-          const strength=.22+Math.sin(clamp((p-.12)/.69)*Math.PI)*.46;
+          const strength=.72+Math.sin(clamp((p-.12)/.69)*Math.PI)*.22;
           const inputs:[number,number][]=[[-216,-176],[-216,0],[-216,176]];
           const branches:[number,number][]=[[-20,-130],[-20,130]];
           inputs.forEach((start,i)=>{
             const branch=branches[i===2?1:0];
-            line([start,[-124,start[1]],[-124,branch[1]],branch],`rgba(82,142,252,${strength})`,1.05);
-            if(i===1)line([start,[-124,0],[-124,130],branches[1]],`rgba(82,142,252,${strength*.65})`,1.05);
+            line([start,[-124,start[1]],[-124,branch[1]],branch],`rgba(113,171,255,${strength})`,2.2);
+            if(i===1)line([start,[-124,0],[-124,130],branches[1]],`rgba(113,171,255,${strength*.8})`,2.2);
           });
-          branches.forEach(point=>line([point,[82,point[1]],[82,0],[212,0]],`rgba(103,162,255,${strength})`,1.4));
+          branches.forEach(point=>line([point,[82,point[1]],[82,0],[212,0]],`rgba(151,199,255,${strength})`,2.5));
           [...inputs,...branches,[212,0] as [number,number]].forEach(([x,z],i)=>{
-            tile(x-6,z-6,12,12,'rgba(9,24,55,.95)');
-            line([[x-6,z-6],[x+6,z-6],[x+6,z+6],[x-6,z+6],[x-6,z-6]],`rgba(149,191,255,${strength+.15})`,.85);
-            if(i===5)tile(x-2,z-2,4,4,'rgba(200,226,255,.8)');
+            tile(x-11,z-11,22,22,'rgba(29,66,131,1)');
+            line([[x-11,z-11],[x+11,z-11],[x+11,z+11],[x-11,z+11],[x-11,z-11]],`rgba(176,216,255,${strength})`,1.2);
+            if(i===5)tile(x-5,z-5,10,10,'rgba(222,240,255,.95)');
           });
         }else{
           // DECISION: one deliberate route through alternate branches. The
           // selected warm trace becomes legible as the planes align, linking
           // this abstract system to the real cash/hiring model below.
-          const strength=.16+smooth((p-.2)/.58)*.62;
+          const strength=.75+smooth((p-.2)/.58)*.23;
           line([[-220,145],[-113,145],[-113,12],[-3,12],[-3,-131],[205,-131]],`rgba(73,119,210,${strength*.5})`,1.1);
           line([[-113,145],[-113,205],[190,205]],`rgba(80,120,190,${strength*.3})`,.8);
           line([[-3,12],[85,12],[85,108],[205,108]],`rgba(80,120,190,${strength*.3})`,.8);
           const trace:[number,number][]=[[-220,145],[-113,145],[-113,12],[-3,12],[-3,-131],[205,-131]];
           ctx.shadowColor='#fe9558';ctx.shadowBlur=8;
-          line(trace,`rgba(247,164,104,${strength})`,1.25);ctx.shadowBlur=0;
+          line(trace,`rgba(255,187,123,${strength})`,2.8);ctx.shadowBlur=0;
           [[-220,145],[-113,12],[-3,-131],[205,-131]].forEach(([x,z],i)=>{
-            tile(x-3,z-3,6,6,`rgba(${i===3?'255,205,149':'118,157,220'},${strength})`);
+            tile(x-6,z-6,12,12,`rgba(${i===3?'255,217,171':'153,196,255'},${strength})`);
           });
           // The end is a larger open diamond, distinguishable without words.
-          line([[205,-149],[223,-131],[205,-113],[187,-131],[205,-149]],`rgba(255,190,129,${strength})`,1.1);
+          line([[205,-156],[230,-131],[205,-106],[180,-131],[205,-156]],`rgba(255,207,153,${strength})`,2);
         }
         ctx.restore();
         const rim=ctx.createLinearGradient(left,top,right,bottom);
@@ -188,7 +189,7 @@ if (canvas && opening) {
       const thread=[];
       for(let j=0;j<=70;j++){
         const t=j/70;
-        thread.push(project(230+Math.sin(t*Math.PI*2)*10,separation+30-t*(separation*2+60),130+Math.cos(t*Math.PI*2)*18));
+        thread.push(project(30+t*240+Math.sin(t*Math.PI*2)*10,separation+20-t*(separation*2+40),130+Math.cos(t*Math.PI*2)*18));
       }
       path(thread);ctx.strokeStyle='rgba(255,164,100,.8)';ctx.lineWidth=1.4;ctx.shadowColor='#ff8a44';ctx.shadowBlur=17;ctx.stroke();ctx.shadowBlur=0;
       [0,.5,1].forEach((t,i)=>{
@@ -261,4 +262,69 @@ if(form){
     setText('chart-title',`Illustrative cash balance. Before hires, ${baseline.toFixed(1)} months of runway. With ${hires} hires, ${runway.toFixed(1)} months of runway. Chart horizon is 12 months.`);
   };
   form.addEventListener('input',update);form.addEventListener('submit',e=>e.preventDefault());update();
+}
+
+// The light chapters continue the same reversible visual argument. Geometry
+// updates only on scrolling/resizing; all prose and static structure stay visible.
+const editorial = document.querySelector<HTMLElement>('.benefits-editorial');
+const trailSvg = document.querySelector<SVGSVGElement>('.trail-connections');
+const cycleFigure = document.querySelector<HTMLElement>('.operating-cycle');
+if (editorial && trailSvg && cycleFigure) {
+  const clampProgress = (n:number) => Math.max(0,Math.min(1,n));
+  const easeProgress = (n:number) => {const t=clampProgress(n);return t*t*(3-2*t);};
+  const trailPaths = Array.from(trailSvg.querySelectorAll<SVGPathElement>('g[stroke] > path'));
+  const articles = Array.from(editorial.querySelectorAll<HTMLElement>('.benefit-rows article'));
+  const sources = Array.from(editorial.querySelectorAll<HTMLElement>('.trail-sources span'));
+  const traces = trailPaths.map(path => {
+    const overlay = path.cloneNode(true) as SVGPathElement;
+    overlay.classList.add('trail-progress');
+    overlay.setAttribute('aria-hidden','true');
+    path.classList.add('trail-track');
+    path.parentElement?.appendChild(overlay);
+    const length = path.getTotalLength();
+    overlay.style.strokeDasharray=String(length);
+    return {overlay,length};
+  });
+  const cycleSvg=cycleFigure.querySelector<SVGSVGElement>('svg');
+  const cycleArcs=Array.from(cycleSvg?.querySelectorAll<SVGPathElement>(':scope > path') || []).slice(0,3);
+  const cycleWords=Array.from(cycleSvg?.querySelectorAll<SVGTextElement>('.cycle-words text') || []);
+  const marker=cycleSvg?.querySelector<SVGCircleElement>('.cycle-marker');
+  const arcLengths=cycleArcs.map(arc=>arc.getTotalLength());
+  cycleArcs.forEach(arc=>arc.classList.add('operating-arc'));
+  let pending=false;
+  const updateEditorial=()=>{
+    pending=false;
+    const still=reducedMotion.matches;
+    editorial.classList.toggle('scroll-story-active',!still);
+    cycleFigure.classList.toggle('scroll-story-active',!still);
+    const viewport=window.innerHeight;
+    const trailBox=trailSvg.closest('figure')?.getBoundingClientRect();
+    const phoneProgress=trailBox?clampProgress((viewport*.8-trailBox.top)/(viewport*.8+trailBox.height*.15)):1;
+    traces.forEach(({overlay,length},i)=>{
+      const top=articles[i]?.getBoundingClientRect().top ?? 0;
+      const progress=still?1:window.innerWidth<768?easeProgress(phoneProgress*3-i):easeProgress((viewport*.83-top)/(viewport*.64));
+      overlay.style.strokeDashoffset=String(length*(1-progress));
+      sources[i]?.style.setProperty('--source-progress',String(progress));
+    });
+    const box=cycleFigure.getBoundingClientRect();
+    const progress=clampProgress((viewport*.85-box.top)/(viewport*.65+box.height*.5));
+    const phase=Math.min(2,Math.floor(progress*3));
+    cycleArcs.forEach((arc,i)=>arc.classList.toggle('is-current',!still&&i===phase));
+    cycleWords.forEach((word,i)=>word.classList.toggle('is-current',!still&&i===phase));
+    if(marker&&cycleArcs.length===3){
+      if(still){marker.setAttribute('cx','422');marker.setAttribute('cy','118');}
+      else{
+        const local=clampProgress(progress*3-phase);
+        const point=cycleArcs[phase].getPointAtLength(arcLengths[phase]*local);
+        marker.setAttribute('cx',String(point.x));marker.setAttribute('cy',String(point.y));
+      }
+    }
+  };
+  const scheduleEditorial=()=>{if(!pending){pending=true;requestAnimationFrame(updateEditorial);}};
+  window.addEventListener('scroll',scheduleEditorial,{passive:true});
+  window.addEventListener('resize',scheduleEditorial,{passive:true});
+  window.addEventListener('pageshow',scheduleEditorial);
+  reducedMotion.addEventListener('change',scheduleEditorial);
+  document.fonts.ready.then(scheduleEditorial);
+  scheduleEditorial();
 }
