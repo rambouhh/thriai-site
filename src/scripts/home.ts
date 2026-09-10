@@ -2,19 +2,6 @@ const canvas = document.querySelector<HTMLCanvasElement>('#system-canvas');
 const opening = document.getElementById('opening');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-// The material establishing shot yields to the real, labeled scenario records.
-// This scene control is independent of WebGL availability and arithmetic.
-let materialFrame=0;
-const updateMaterialHero=()=>{
-  materialFrame=0;
-  const amount=reducedMotion.matches?0:Math.max(0,Math.min(1,-(opening?.getBoundingClientRect().top||0)/(innerHeight*.6)));
-  const progress=amount*amount*(3-2*amount);
-  document.documentElement.style.setProperty('--material-hero-opacity',String(1-progress));
-  document.documentElement.style.setProperty('--material-hero-travel',`${progress*35}px`);
-};
-const scheduleMaterialHero=()=>{if(!materialFrame)materialFrame=requestAnimationFrame(updateMaterialHero);};
-window.addEventListener('scroll',scheduleMaterialHero,{passive:true});window.addEventListener('resize',scheduleMaterialHero,{passive:true});window.addEventListener('pageshow',scheduleMaterialHero);reducedMotion.addEventListener('change',scheduleMaterialHero);updateMaterialHero();
-
 // The planes represent records, models and decisions. Their alignment is tied
 // directly to scroll position, so reverse scrolling and mid-page loads agree.
 if (canvas && opening) {
@@ -227,7 +214,7 @@ if (canvas && opening) {
       if(label)label.textContent=p<.25?'01 / CONNECT THE INFORMATION':p<.57?'02 / BUILD THE SYSTEM':'03 / EXTEND THE EXPERTISE';
     };
     const loop = (time:number) => {
-      if(active && document.documentElement.dataset.instrumentRenderer!=='webgl' && !document.hidden && time-lastFrame>33){draw(time);lastFrame=time;}
+      if(active && document.documentElement.dataset.instrumentRenderer!=='native-svg' && !document.hidden && time-lastFrame>33){draw(time);lastFrame=time;}
       if(!reducedMotion.matches)frame=requestAnimationFrame(loop);
     };
     new IntersectionObserver(([entry])=>{active=entry.isIntersecting;},{rootMargin:'100px'}).observe(opening);

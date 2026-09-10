@@ -12,22 +12,24 @@ does not define the service or establish a client result.
   It was made with the built-in image generation tool as a material concept,
   then selected for the hero. The generation prompt and design evidence remain
   in the private Gauntlet run directory outside this application.
-- `src/scripts/finance-scene.ts` supplies the live records-to-model sequence.
-  One WebGL context paints visible page slots. Geometry follows scroll position
-  and validated synthetic assumptions; reversing the scroll must restore the
-  same state. Reduced motion uses stable geometry.
+- `src/scripts/finance-scene.ts` moves the same glass artwork through the opening,
+  reveals native record labels and projects a live SVG trace onto its central
+  surface. The recognizable material and trace recur in the proof and brief.
+  Scroll position and validated synthetic assumptions determine each state;
+  reversing the scroll must restore the same placement. Reduced motion keeps
+  the opening artwork stable. This renderer does not require WebGL.
 - `src/scripts/home.ts` owns the independent arithmetic and native fallback.
-  Visual loading or context loss must not prevent calculation or navigation.
+  Visual loading failure must not prevent calculation or navigation.
   Every displayed result and chart must clear when assumptions are invalid.
 - The main model, later cash chart and decision brief share the same assumptions.
   Charts stop at zero; the month-12 numeric result may be negative. Text explains
   that the example is simple arithmetic, not an AI recommendation.
 
-The renderer caps pixel density and update frequency and skips offscreen slots.
-Keep the plotting surface and text readable; use curved shoulders, thickness and
-reflections for depth. Three's RoundedBoxGeometry clamps a requested radius to
-half the shortest dimension, so a thin front plate can hide a body's intended
-rounded silhouette. The dependency's MIT notice is in `public/licenses/`.
+The scene renders on scroll, resize and value changes. Keep the bitmap's material
+identity intact through the handoff; avoid dissolving it into unrelated object
+outlines. HTML labels remain separate from the decorative image. If the artwork
+fails, hide every material slot and retain native content, the calculator and
+the independent canvas fallback. Three.js was removed with the former renderer.
 
 ## Proof boundaries
 
@@ -42,6 +44,6 @@ preview or as completed client work.
 
 Build the static output and inspect actual desktop/mobile pages, including slow,
 fast and reverse scrolling. Check changed assumptions, invalid inputs, keyboard
-use, reduced motion, WebGL unavailable and real graphics-context loss. Inspect
+use, reduced motion, canvas unavailable and artwork loading failure. Inspect
 all supporting routes and published prices. Private Gauntlet evidence, critic
 reports and source revision records live outside this repository.
