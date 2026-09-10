@@ -37,7 +37,9 @@ does not define the service or establish a client result.
   stable resolved sheet. Reverse scrolling must restore placement and reveal.
 - The same working sheet remains mounted and visible as the benefit copy enters.
   Desktop keeps it beside the copy; mobile compacts the same record, graph and
-  essential values above the benefits. The duplicate cash landscape is removed.
+  essential values into a178px dock above the benefits. It slides out after
+  the first benefit so later copy can use the full viewport; reverse scrolling
+  restores the same dock and sheet. The duplicate cash landscape is removed.
   Reduced motion shows the complete sheet in normal flow before the benefits.
 - The main model and later decision brief share the same assumptions.
   Charts stop at zero; the month-12 numeric result may be negative. Text explains
