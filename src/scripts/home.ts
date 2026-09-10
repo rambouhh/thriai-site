@@ -345,9 +345,10 @@ const paintWorkingSequence=()=>{
   const clamp=(n:number)=>Math.max(0,Math.min(1,n));
   const smooth=(n:number)=>{const t=clamp(n);return t*t*(3-2*t);};
   const progress=reducedMotion.matches||workingOverride?1:mobile?clamp((12-bounds.top)/Math.max(240,(workingJourney?.offsetHeight||1060)-workingScene.offsetHeight)):clamp((70-bounds.top)/Math.max(300,workingWorkspace.offsetHeight-workingScene.offsetHeight));
-  const dock=smooth(progress/.55),resolve=smooth((progress-.58)/.42);
-  const applied=progress>=.55,brief=progress>=.8,valid=workingScene.dataset.state!=='invalid';
-  const forecast=smooth((progress-.55)/.25);
+  const dockEnd=mobile?.3:.55,forecastEnd=mobile?.5:.8,briefStart=mobile?.85:.8;
+  const dock=smooth(progress/dockEnd),resolve=smooth((progress-briefStart)/(1-briefStart));
+  const applied=progress>=(mobile?forecastEnd:dockEnd),brief=progress>=briefStart,valid=workingScene.dataset.state!=='invalid';
+  const forecast=smooth((progress-dockEnd)/(forecastEnd-dockEnd));
   workingScene.style.setProperty('--forecast',String(forecast));
   workingScene.dataset.hiringState=applied?'applied':'unapplied';
   workingScene.dataset.workingMode=reducedMotion.matches?'reduced':workingOverride?'interaction':'scroll';
@@ -369,7 +370,7 @@ const paintWorkingSequence=()=>{
   const endpointX=Number(endpoint?.getAttribute('cx')||520),endpointY=Number(endpoint?.getAttribute('cy')||138);
   document.querySelector('[data-working-reveal]')?.setAttribute('width',String((endpointX-20)*forecast));
   if(endpoint){endpoint.style.transform=`translate(${(20-endpointX)*(1-forecast)}px,${(24-endpointY)*(1-forecast)}px)`;endpoint.style.visibility=forecast>0?'visible':'hidden';}
-  workingScene.dataset.workingPhase=progress<.24?'record':progress<.8?'model':'decision';
+  workingScene.dataset.workingPhase=progress<dockEnd?'record':progress<briefStart?'model':'decision';
   workingScene.dataset.workingProgress=progress.toFixed(3);
 };
 const scheduleWorkingSequence=()=>{if(!workingFrame)workingFrame=requestAnimationFrame(paintWorkingSequence);};

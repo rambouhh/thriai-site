@@ -286,7 +286,7 @@
 .record-socket{position:absolute;left:24px;top:8px;width:220px;height:135px;display:flex;align-items:center;justify-content:center;border:1px dashed #cf9b6777;border-radius:13px 4px;color:#a9bdd7;font:400 10px/1.4 Space,sans-serif;opacity:calc(1 - var(--dock));pointer-events:none}
 .demo-workspace{overflow-anchor:none}
 @media(max-width:1100px) and (min-width:768px){.record-socket{left:16px;width:185px}}
-@media(max-width:767px){.record-socket{left:15px;top:20px;width:185px;height:120px;font-size:8px}.working-journey{height:calc(1060px - var(--journey-dock,0)*158px)}.demo-result{height:calc(760px - var(--dock)*158px)}}
+@media(max-width:767px){.record-socket{left:15px;top:20px;width:185px;height:120px;font-size:8px}.working-journey{height:calc(1460px - var(--journey-dock,0)*158px)}.demo-result{height:calc(760px - var(--dock)*158px)}}
 @media(prefers-reduced-motion:reduce) and (max-width:767px){.working-journey{height:auto}.demo-result{height:650px}}
 .working-sheet:before{opacity:0}.demo-result[data-working-phase=decision] .working-sheet:before,.demo-result:not([data-working-phase]) .working-sheet:before{opacity:1}
 @media(max-width:767px){.sheet-decision-title .decision-long{display:none}}

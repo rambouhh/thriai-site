@@ -31,7 +31,8 @@ does not define the service or establish a client result.
   its changed forecast, then reveals the tradeoff. Financial values are never
   interpolated. Editing inputs or choosing Show hiring result resolves the
   answer immediately; forward navigation preserves it and deliberate reverse
-  scrolling replays the sequence. Mobile uses a bounded sticky interval so the
+  scrolling replays the sequence. Mobile gives the fully connected forecast
+  a stable middle beat before the brief, within a700px sticky interval so the
   operation is visible while the sheet is in view; reduced motion shows the
   stable resolved sheet. Reverse scrolling must restore placement and reveal.
 - The main model, later cash chart and decision brief share the same assumptions.
