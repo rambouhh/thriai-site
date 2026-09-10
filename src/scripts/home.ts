@@ -7,8 +7,13 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 if (canvas && opening) {
   const ctx = canvas.getContext('2d');
   if (ctx) {
+    const stage = canvas.parentElement;
+    const delivery = opening.querySelector<HTMLElement>('.delivery-section');
+    const reach = opening.querySelector<HTMLElement>('.reach-section');
+    const sceneIndex = opening.querySelector<HTMLElement>('.scene-index');
     let width = 0, height = 0, frame = 0, lastFrame = 0, active = true;
     const clamp = (n: number, a = 0, b = 1) => Math.max(a, Math.min(b,n));
+    const smooth = (n:number) => {const t=clamp(n);return t*t*(3-2*t);};
     const resize = () => {
       width = canvas.clientWidth; height = canvas.clientHeight;
       const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
@@ -19,6 +24,17 @@ if (canvas && opening) {
       const rect = opening.getBoundingClientRect();
       const p = reducedMotion.matches ? 0 : clamp(-rect.top / (opening.offsetHeight - height));
       const mobile = width < 768;
+      const deliveryBounds = delivery?.getBoundingClientRect();
+      const reachBounds = reach?.getBoundingClientRect();
+      // Legibility belongs to the continuous viewport scene, never a moving
+      // rectangular chapter overlay. Opacity is reversible scroll geometry.
+      const presence = (bounds:DOMRect|undefined) => bounds ? smooth((height-bounds.top)/(height*.9))*smooth(bounds.bottom/(height*.85)) : 0;
+      const deliveryPresence = presence(deliveryBounds);
+      const reachPresence = presence(reachBounds);
+      const scrim = Math.max(deliveryPresence*.93,reachPresence*(mobile?.62:.43));
+      stage?.style.setProperty('--scene-scrim',scrim.toFixed(3));
+      const labelAlpha = deliveryBounds ? smooth((deliveryBounds.top-height*.65)/(height*.35)) : 1;
+      if(sceneIndex)sceneIndex.style.opacity=String(labelAlpha);
       const bluePhase = clamp((p - .35) / .5);
       const scale = (mobile ? width * .00123 : Math.min(width * .00084,1.4)) * (1 + bluePhase * .28);
       const centerX = width * (mobile ? .69 - bluePhase * .2 : .79 - bluePhase * .37);
@@ -38,10 +54,11 @@ if (canvas && opening) {
         return {x:centerX+rotX*scale*persp,y:centerY+ry*scale*persp,z:rz};
       };
       const path = (points:{x:number,y:number}[]) => {ctx.beginPath();points.forEach((v,i)=>i?ctx.lineTo(v.x,v.y):ctx.moveTo(v.x,v.y));};
+      const separation=130+Math.sin(p*Math.PI)*62;
       const layers = [
-        {y:130,size:329,color:'65,111,255'},
-        {y:0,size:343,color:'98,151,255'},
-        {y:-130,size:355,color:'255,151,91'},
+        {y:separation,size:329,color:'65,111,255'},
+        {y:0,size:343-bluePhase*24,color:'98,151,255'},
+        {y:-separation,size:355-bluePhase*62,color:'255,151,91'},
       ];
       layers.forEach((layer,li) => {
         const drift = (1-bluePhase) * (li-1) * 38;
@@ -88,6 +105,66 @@ if (canvas && opening) {
         for(const inset of [10,20,31]){
           path(contour(inset));ctx.strokeStyle=`rgba(111,158,248,${inset===31?.13:.07})`;ctx.lineWidth=.65;ctx.stroke();
         }
+        // Each material surface carries a different, nonnumeric structure.
+        // All marks share its world coordinates and are clipped before the
+        // next, nearer plane is drawn, so the geometry obeys true occlusion.
+        ctx.save();path(inner);ctx.closePath();ctx.clip();
+        const surface=(x:number,z:number)=>project(x+drift,layer.y-1,z);
+        const line=(points:[number,number][],color:string,lineWidth=1)=>{
+          path(points.map(([x,z])=>surface(x,z)));ctx.strokeStyle=color;ctx.lineWidth=lineWidth;ctx.stroke();
+        };
+        const tile=(x:number,z:number,w:number,h:number,color:string)=>{
+          path([surface(x,z),surface(x+w,z),surface(x+w,z+h),surface(x,z+h)]);ctx.closePath();ctx.fillStyle=color;ctx.fill();
+        };
+        if(li===0){
+          // RECORDS: regular entries and reconciliation rails. Equal units
+          // describe structure, never a fabricated company data series.
+          const strength=.3+(1-smooth(p/.5))*.45;
+          for(let row=0;row<8;row++){
+            const z=-203+row*55;
+            tile(-228,z,7,7,`rgba(115,169,255,${strength})`);
+            tile(-191,z,176,2,`rgba(82,130,218,${strength*.45})`);
+            tile(24,z,66,2,`rgba(112,153,222,${strength*.65})`);
+            tile(139,z,53,2,`rgba(112,153,222,${strength*.65})`);
+          }
+          line([[-204,-222],[-204,224]],'rgba(105,152,231,.16)');
+          line([[114,-222],[114,224]],'rgba(105,152,231,.16)');
+          line([[-228,241],[212,241]],'rgba(113,164,255,.42)',1.2);
+        }else if(li===1){
+          // MODEL: a governed dependency structure joins inputs to one spine.
+          // Its paths brighten around the middle of the scroll argument.
+          const strength=.22+Math.sin(clamp((p-.12)/.69)*Math.PI)*.46;
+          const inputs:[number,number][]=[[-216,-176],[-216,0],[-216,176]];
+          const branches:[number,number][]=[[-20,-130],[-20,130]];
+          inputs.forEach((start,i)=>{
+            const branch=branches[i===2?1:0];
+            line([start,[-124,start[1]],[-124,branch[1]],branch],`rgba(82,142,252,${strength})`,1.05);
+            if(i===1)line([start,[-124,0],[-124,130],branches[1]],`rgba(82,142,252,${strength*.65})`,1.05);
+          });
+          branches.forEach(point=>line([point,[82,point[1]],[82,0],[212,0]],`rgba(103,162,255,${strength})`,1.4));
+          [...inputs,...branches,[212,0] as [number,number]].forEach(([x,z],i)=>{
+            tile(x-6,z-6,12,12,'rgba(9,24,55,.95)');
+            line([[x-6,z-6],[x+6,z-6],[x+6,z+6],[x-6,z+6],[x-6,z-6]],`rgba(149,191,255,${strength+.15})`,.85);
+            if(i===5)tile(x-2,z-2,4,4,'rgba(200,226,255,.8)');
+          });
+        }else{
+          // DECISION: one deliberate route through alternate branches. The
+          // selected warm trace becomes legible as the planes align, linking
+          // this abstract system to the real cash/hiring model below.
+          const strength=.16+smooth((p-.2)/.58)*.62;
+          line([[-220,145],[-113,145],[-113,12],[-3,12],[-3,-131],[205,-131]],`rgba(73,119,210,${strength*.5})`,1.1);
+          line([[-113,145],[-113,205],[190,205]],`rgba(80,120,190,${strength*.3})`,.8);
+          line([[-3,12],[85,12],[85,108],[205,108]],`rgba(80,120,190,${strength*.3})`,.8);
+          const trace:[number,number][]=[[-220,145],[-113,145],[-113,12],[-3,12],[-3,-131],[205,-131]];
+          ctx.shadowColor='#fe9558';ctx.shadowBlur=8;
+          line(trace,`rgba(247,164,104,${strength})`,1.25);ctx.shadowBlur=0;
+          [[-220,145],[-113,12],[-3,-131],[205,-131]].forEach(([x,z],i)=>{
+            tile(x-3,z-3,6,6,`rgba(${i===3?'255,205,149':'118,157,220'},${strength})`);
+          });
+          // The end is a larger open diamond, distinguishable without words.
+          line([[205,-149],[223,-131],[205,-113],[187,-131],[205,-149]],`rgba(255,190,129,${strength})`,1.1);
+        }
+        ctx.restore();
         const rim=ctx.createLinearGradient(left,top,right,bottom);
         rim.addColorStop(0,li===2?'#ffbe86':'#4c83ed');rim.addColorStop(.19,li===2?'#ed8844':'#2b65ea');rim.addColorStop(.36,'#122e63');rim.addColorStop(.52,'#153ba5');rim.addColorStop(.74,'#428aff');rim.addColorStop(.86,'#a6d4ff');rim.addColorStop(1,'#2a60ce');
         // Bloom follows only the true outer edge. The bright core has a narrow
@@ -111,18 +188,20 @@ if (canvas && opening) {
       const thread=[];
       for(let j=0;j<=70;j++){
         const t=j/70;
-        thread.push(project(230+Math.sin(t*Math.PI*2)*10,170-t*380,130+Math.cos(t*Math.PI*2)*18));
+        thread.push(project(230+Math.sin(t*Math.PI*2)*10,separation+30-t*(separation*2+60),130+Math.cos(t*Math.PI*2)*18));
       }
       path(thread);ctx.strokeStyle='rgba(255,164,100,.8)';ctx.lineWidth=1.4;ctx.shadowColor='#ff8a44';ctx.shadowBlur=17;ctx.stroke();ctx.shadowBlur=0;
-      [0,.45,1].forEach((t,i)=>{
+      [0,.5,1].forEach((t,i)=>{
         const at=thread[Math.round(t*70)];ctx.fillStyle=i===2?'#ffc390':'#8eb5ff';ctx.fillRect(at.x-2,at.y-2,4,4);
-        if(!mobile){
+        if(!mobile && labelAlpha>.01){
+          ctx.save();ctx.globalAlpha=labelAlpha;
           const name=['RECORDS','MODELS','DECISIONS'][i];
           ctx.font='12px monospace';ctx.letterSpacing='1px';
           const textWidth=ctx.measureText(name).width;
           const tx=clamp(at.x+14,Math.max(28,width*.52),width-textWidth-28),ty=clamp(at.y+4,125,height-75);
           if(Math.abs(tx-at.x)>28||Math.abs(ty-at.y)>20){ctx.beginPath();ctx.moveTo(at.x,at.y);ctx.lineTo(tx-8,ty-4);ctx.strokeStyle='rgba(143,173,217,.24)';ctx.lineWidth=.6;ctx.stroke();}
           ctx.fillStyle=i===2?'#efbd99':'#a4b8d8';ctx.fillText(name,tx,ty);
+          ctx.restore();
         }
       });
       // A single pulse along the connection, never a decorative particle field.

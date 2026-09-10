@@ -37,3 +37,15 @@
 .proof-intro .proof-disclosure{max-width:360px;padding-top:18px;border-top:1px solid #c4ccd5;color:#4e5b6d}
 @media(max-width:767px){.reach-section{min-height:0;padding-bottom:90px}.reach-copy{margin-top:54px;margin-left:0;max-width:460px;padding:22px 20px;background:linear-gradient(105deg,#080f20ed,#101b32e0);border-left:2px solid #6897ff}.reach-copy p{color:#e2ebfa}.reach-copy .reach-statement{margin-top:24px}.proof-intro>div{margin-left:0}.demo-badge{font-size:12px}.demo-assumptions>div{font-size:14px}.cash-chart text{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.system-track .system-stage{position:absolute;inset:0;min-height:900px}.opening>.light-transition{background:linear-gradient(#173ab0,#86b8ff,#f4f5f3)}}
+
+/* Round 03: chapter text crosses one continuous scene, without tint bands. */
+.opening>.delivery-section,.opening>.reach-section{background:transparent}
+.system-track .system-stage::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(8,11,16,.89) 0%,rgba(8,11,16,.83) 52%,rgba(8,11,16,.69) 100%);opacity:var(--scene-scrim,0)}
+.system-stage .scene-index{z-index:2}
+.reach-copy p{position:relative;text-shadow:0 1px 10px rgba(3,8,17,.4)}
+@media(max-width:767px){.reach-copy{background:transparent}}
+@media(prefers-reduced-motion:reduce){.opening>.reach-section{background:transparent}.opening{background:linear-gradient(180deg,#080b10 0%,#080b10 49%,#102343 76%,#173ab0 100%)}}
+/* The scope diagram carries the system metaphor into the light reading sequence. */
+.scope-section:before{display:none}.scope-map{width:min(100%,840px);margin:0 auto 80px;padding:12px 0 30px}.scope-map svg{display:block;width:100%;overflow:visible}.scope-map text{font:500 24px Space,Arial,sans-serif;text-anchor:middle;fill:#294264;letter-spacing:-.5px}.scope-map .map-core{fill:#fff;font-size:23px}.scope-map .map-output{font-weight:700;fill:#244df5}.scope-map figcaption{text-align:center;color:#526782;font-size:14px;margin-top:30px}.proof-intro h2{position:sticky;top:100px;align-self:start}.cash-chart text:last-child{text-anchor:end}
+@media(max-width:767px){.scope-map{margin-bottom:50px}.scope-map figcaption{font-size:14px;max-width:260px;margin:25px auto 0}.scope-map text{font-size:26px}.scope-map .map-core{font-size:25px}.proof-intro h2{position:static}.cash-chart text{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.proof-intro h2{position:static}}
