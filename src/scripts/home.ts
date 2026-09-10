@@ -214,7 +214,7 @@ if (canvas && opening) {
       if(label)label.textContent=p<.25?'01 / CONNECT THE INFORMATION':p<.57?'02 / BUILD THE SYSTEM':'03 / EXTEND THE EXPERTISE';
     };
     const loop = (time:number) => {
-      if(active && !document.hidden && time-lastFrame>33){draw(time);lastFrame=time;}
+      if(active && document.documentElement.dataset.instrumentRenderer!=='webgl' && !document.hidden && time-lastFrame>33){draw(time);lastFrame=time;}
       if(!reducedMotion.matches)frame=requestAnimationFrame(loop);
     };
     new IntersectionObserver(([entry])=>{active=entry.isIntersecting;},{rootMargin:'100px'}).observe(opening);
@@ -279,6 +279,7 @@ function refreshStorySummary(){
   summary.textContent=visual.dataset.state==='invalid'?'Complete the demo inputs to update this scenario.':view==='sources'?`Cash ${visual.dataset.cash} · ${visual.dataset.hires} planned hires`:view==='model'?`${visual.dataset.runway} months of runway · ${visual.dataset.total}/month burn`:`Month 12 cash: ${visual.dataset.remaining}. Review timing and cash buffer.`;
 }
 function updateWorkingStory(values:{cash:number;burn:number;hires:number;cost:number}|null){
+  window.dispatchEvent(new CustomEvent('thriai:scenario',{detail:values}));
   const visual=document.querySelector<HTMLElement>('.story-visual');
   if(!visual)return;
   const write=(key:string,value:string)=>visual.querySelectorAll<HTMLElement>(`[data-scenario="${key}"]`).forEach(node=>node.textContent=value);
@@ -321,3 +322,6 @@ window.addEventListener('resize',scheduleFinanceScenes,{passive:true});
 window.addEventListener('pageshow',scheduleFinanceScenes);
 reducedMotion.addEventListener('change',scheduleFinanceScenes);
 document.fonts.ready.then(scheduleFinanceScenes);scheduleFinanceScenes();
+
+// Visual enhancement is isolated from all arithmetic and navigation.
+import('./finance-scene').then(({startFinanceScene})=>{try{startFinanceScene();}catch{/* Native artwork remains available. */}}).catch(()=>{});
