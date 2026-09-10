@@ -45,6 +45,11 @@ outlines. HTML labels remain separate from the decorative image. If the artwork
 fails, hide every material slot and retain native content, the calculator and
 the independent canvas fallback. Three.js was removed with the former renderer.
 
+The working record and sheet share upper-left illumination, a blue-black face
+and restrained copper/blue bevels. A projected shadow follows the existing
+docking state, softening at altitude and tightening at contact beneath the text.
+The final pale reading surface retains the same dark structural perimeter.
+
 ## Proof boundaries
 
 Founder operating experience is separate from Thriai client engagements. A future
